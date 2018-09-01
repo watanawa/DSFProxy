@@ -1,6 +1,8 @@
 package com.schwipps.DSFBuilder;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class DSFHeader {
 	private byte[] b;
@@ -25,13 +27,12 @@ public class DSFHeader {
 	
 	//Header GET field methods
 	public int getInstanceID() {
-		byte[] tempB = new byte[4];
-		tempB[0] = (byte)0x00;
-		tempB[1] = (byte)0x00;
-		tempB[2] = (byte)0xFF;
-		tempB[3] = (byte)0xFF;
-		return ByteBuffer.wrap(tempB).getInt();
-
+		byte[] tempB = new byte[3];
+		tempB [0] = 0x00;
+		tempB[1] = b[0];
+		tempB[2] = b[1];
+		return new BigInteger(tempB).intValue();
+		//return ByteBuffer.wrap(tempB).getInt();
 	}
 	/*
 	public int getMessageType() {

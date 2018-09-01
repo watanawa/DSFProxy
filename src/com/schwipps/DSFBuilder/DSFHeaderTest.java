@@ -16,6 +16,8 @@ class DSFHeaderTest {
 
     @Test
     void getInstanceID() {
+
+
         byte[] b = new byte[8];
         for(int i = 0; i < 8; i++) {
             b[i] = (byte) 0xFF;
