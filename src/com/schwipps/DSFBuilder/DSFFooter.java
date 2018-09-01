@@ -9,7 +9,7 @@ public class DSFFooter {
 	
 	public byte[] getByte() {
 		//TEST
-		int = 0;
+		int x = 0;
 		return b;
 
 	}
