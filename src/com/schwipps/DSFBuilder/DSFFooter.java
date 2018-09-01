@@ -8,8 +8,10 @@ public class DSFFooter {
 	}
 	
 	public byte[] getByte() {
+		//TEST
+		int = 0;
 		return b;
-		
+
 	}
 	
 	public int getLength() {
