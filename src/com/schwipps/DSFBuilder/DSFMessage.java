@@ -1,5 +1,7 @@
 package com.schwipps.DSFBuilder;
 
+import sun.management.Agent;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -7,7 +9,24 @@ public class DSFMessage {
 	private DSFHeader head;
 	private DSFBody body;
 	private DSFFooter footer;
-	
+
+	public enum messageType {
+		TARGET_AGENT_REQUEST_MESSAGE(10000),
+		TARGET_AGENT_DATA_MESSAGE(10001),
+		DEBUG_DATA_READ_REQUEST_MESSAGE(10004),
+		DEBUG_DATA_WRITE_REQUEST_MESSAGE(10013),
+		DEBUG_DATA_MESSAGE(10005),
+		INVALID_MESSAGE_HANDLE(42);
+		private final int i;
+		messageType(int i) {
+			this.i = i;
+		}
+		public int getValue(){
+			return i;
+		}
+
+	}
+
 	public DSFMessage(DSFHeader head, DSFBody body, DSFFooter footer) {
 		this.head = head;
 		this.body = body;
@@ -65,5 +84,14 @@ public class DSFMessage {
 		this.footer = footer;
 	}
 	
-	
+	public messageType getMessageType(){
+		switch(head.getMessageType()){
+			case(10000): return messageType.TARGET_AGENT_REQUEST_MESSAGE;
+			case(10001): return messageType.TARGET_AGENT_DATA_MESSAGE;
+			case(10004): return messageType.DEBUG_DATA_READ_REQUEST_MESSAGE;
+			case(10013): return messageType.DEBUG_DATA_WRITE_REQUEST_MESSAGE;
+			case(10005): return messageType.DEBUG_DATA_MESSAGE;
+		}
+		return messageType.INVALID_MESSAGE_HANDLE;
+	}
 }
