@@ -5,15 +5,18 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class DSFHeader {
-	// InstanceID       0-65,535    2Byte uint
+    /* Header Structure 8Byte
+    // InstanceID       0-65,535    2Byte uint
     // MessageType      0-65,535    2Byte uint
     // MessageLength    0-65,535    2Byte uint
     // AckRequired                  1Bit
     // IDDVersion       0-127       7bit uint
     // CheksumSize      0,2,4       2bit
+    */
+
 
     private byte[] b;
-
+    //+++++Constructors+++++
 	public DSFHeader(byte[] b) {
 		this.b = b;
 		// TODO Auto-generated constructor stub
@@ -28,7 +31,7 @@ public class DSFHeader {
         setChecksumSize(checksumSize);
 	}
 	
-	//Byte methods
+
 	public byte[] getByte() {
 		return b;
 	}
@@ -36,7 +39,7 @@ public class DSFHeader {
 		return b.length;
 	}
 	
-	//Header GET field methods
+	//+++++Field Getter+++++
 	public int getInstanceID() {
 		byte[] intTemp = new byte[4];
 		intTemp[1] = 0x00;
@@ -65,18 +68,13 @@ public class DSFHeader {
 	}
 	
 	public boolean getAckRequired() {
-	    if((b[6] & (0x80)) != 0) {
-	        return true;
-        }
-        else{
-            return false;
-        }
+	    return ((b[6] & (0x80)) != 0) ; // 1000 0000
 	}
 	
 	public int getIDDVersion() {
         byte[] intTemp = new byte[4];
+        intTemp[0] = 0x00;
         intTemp[1] = 0x00;
-        intTemp[2] = 0x00;
         intTemp[2] = 0x00;
         intTemp[3] = (byte)(b[6] & 0x7F); // 0111 1111
         return ByteBuffer.wrap(intTemp).getInt();
@@ -103,7 +101,7 @@ public class DSFHeader {
 		return 0;
 	}
 
-	//Header SET field methods
+	//+++++Field Setter+++++
     // 2Byte Uint 0-65,535
 	public void setInstanceID(int val) {
         byte[] valueByte = intToByte(val);
@@ -127,7 +125,6 @@ public class DSFHeader {
 	public void setAckRequired(boolean value) {
 		//Sets the first bit
 	    if(value){
-
             b[6] |= 0x80 ; // 1000 0000 ^ ;
         }
         else{
@@ -139,12 +136,10 @@ public class DSFHeader {
         byte temp = intToByte(val)[3];
         // Take care of the AckRequired -> They are in the same byte
         if(getAckRequired()){
-            b[6] = temp;
-            setAckRequired(true);
+            b[6] = (byte)(temp|0x80); // 1000 0000
         }
         else{
-            b[6] = temp;
-            setAckRequired(false);
+            b[6] = (byte)(temp & 0x7F); //0111 1111
         }
 	}
 	
@@ -165,7 +160,6 @@ public class DSFHeader {
         }
         b[7] = temp;
 	}
-
 
 	private byte[] intToByte(int val){
 	    return ByteBuffer.allocate(4).putInt(val).array();

@@ -10,13 +10,15 @@ class DSFHeaderTest {
     @Test
     void dsfHeader(){
         DSFHeader head = new DSFHeader(1,2,3,true,4,4);
+
         Assertions.assertEquals(1,head.getInstanceID());
         Assertions.assertEquals(2,head.getMessageType());
         Assertions.assertEquals(3,head.getMessageLength());
         Assertions.assertEquals(true,head.getAckRequired());
         Assertions.assertEquals(4,head.getIDDVersion());
         Assertions.assertEquals(4,head.getChecksumSize());
-    }
+
+        }
 
     @Test
     void getByte() {
@@ -190,5 +192,16 @@ class DSFHeaderTest {
 
     @Test
     void setChecksumSize() {
+        byte[] b = new byte[8];
+        for(int i = 0; i < 8; i++) {
+            b[i] = (byte) 0x00;
+        }
+        DSFHeader head = new DSFHeader(b);
+        head.setChecksumSize(0);
+        Assertions.assertEquals(0,head.getChecksumSize());
+        head.setChecksumSize(2);
+        Assertions.assertEquals(2,head.getChecksumSize());
+        head.setChecksumSize(4);
+        Assertions.assertEquals(4,head.getChecksumSize());
     }
 }
