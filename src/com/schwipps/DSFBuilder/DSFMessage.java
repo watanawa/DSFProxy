@@ -25,7 +25,7 @@ public class DSFMessage {
 	
 	public byte[] getByte() {
 		//Assembles head+body+footer
-		byte[] b =  new byte[head.getLength() + head.getMessageLength() + head.getLength()];
+		byte[] b =  new byte[head.getLength() + head.getMessageLength() + head.getChecksumSize()];
 		//fills Head
 		for(int i = 0; i < head.getLength(); i++) {
 			b[i] = head.getByte()[i];
