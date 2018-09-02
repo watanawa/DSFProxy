@@ -40,7 +40,10 @@ public class DSFFooter {
 				b[1] = temp[3];
 				break;
 			case(4):
-				b = temp;
+				b[0] = temp[0];
+				b[1] = temp[1];
+				b[2] = temp[2];
+				b[3] = temp[3];
 				break;
 		}
 	}
