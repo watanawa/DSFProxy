@@ -1,6 +1,7 @@
 package com.schwipps.Test.DSFBuilder;
 
 import com.schwipps.DSFBuilder.*;
+import com.schwipps.DSFBuilder.enums.targetAgentRequestCommand;
 import org.junit.jupiter.api.Test;
 
 class DSFMessageTest {
@@ -8,7 +9,7 @@ class DSFMessageTest {
     @Test
     void getByte() {
         DSFHeader header    = new DSFHeader(1,DSFMessage.messageType.TARGET_AGENT_REQUEST_MESSAGE.getValue(),3,true,10, 4);
-        DSFBody body        = new DSFBodyTargetAgentRequestMessage(1, DSFBodyTargetAgentRequestMessage.targetAgentRequestCommand.CONNECT_TO_TARGET_AGENT);
+        DSFBody body        = new DSFBodyTargetAgentRequestMessage(1, targetAgentRequestCommand.CONNECT_TO_TARGET_AGENT);
         DSFFooter footer    = new DSFFooter(header.calculateChecksum()+body.calculateChecksum(),header.getChecksumSize());
 
         DSFMessage dsfMessage = new DSFMessage(header,body,footer);

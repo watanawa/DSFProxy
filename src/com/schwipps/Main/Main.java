@@ -1,6 +1,7 @@
 package com.schwipps.Main;
 
 import com.schwipps.DSFBuilder.*;
+import com.schwipps.DSFBuilder.enums.targetAgentRequestCommand;
 import com.schwipps.dsf.TypeEquipmentDescription;
 
 import java.io.File;
@@ -16,7 +17,7 @@ public class Main {
         TypeEquipmentDescription equipment =  unmarshaller.unmarshal(new File("C:\\Users\\Chris\\Desktop\\Bachelor\\QC11_Testing\\Release\\CF_EquipmentDefinition.xml"));
 
         DSFHeader header    = new DSFHeader(1,2,3,true,10, 4);
-        DSFBody body        = new DSFBodyTargetAgentRequestMessage(1, DSFBodyTargetAgentRequestMessage.targetAgentRequestCommand.CONNECT_TO_TARGET_AGENT);
+        DSFBody body        = new DSFBodyTargetAgentRequestMessage(1, targetAgentRequestCommand.CONNECT_TO_TARGET_AGENT);
         DSFFooter footer    = new DSFFooter(header.calculateChecksum()+body.calculateChecksum(),header.getChecksumSize());
 
         DSFMessage dsfMessage = new DSFMessage(header,body,footer);

@@ -31,7 +31,7 @@ public class DSFBody {
 	protected int byteToInt(byte[] bArray){
 		byte[] temp = new byte[4];
 		for(int i = 0; i < 4; i++){
-			if(i< bArray.length)temp[3-i] = bArray[i];
+			if(i< bArray.length)temp[3-i] = bArray[bArray.length - i -1];
 			else{
 				temp[3-i] = 0x00;
 			}

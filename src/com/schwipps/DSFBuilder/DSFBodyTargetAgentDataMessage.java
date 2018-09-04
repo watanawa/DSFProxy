@@ -1,5 +1,7 @@
 package com.schwipps.DSFBuilder;
 
+import com.schwipps.DSFBuilder.enums.targetAgentMode;
+
 import java.util.Arrays;
 
 public class DSFBodyTargetAgentDataMessage extends  DSFBody{
@@ -15,16 +17,7 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     28  MaxSamplingFrequency        1Byte   uint
     */
 
-    public enum targetAgentMode{
-        DISCONNECTED(0),
-        CONNECTED(1),
-        INVALID(2);
 
-        private final int i;
-
-        targetAgentMode(int i){ this.i = i;}
-        public int getValue(){return i;}
-    }
     public DSFBodyTargetAgentDataMessage(byte[] b) {
         super(b);
     }
@@ -44,9 +37,9 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     }
     public targetAgentMode getMode(){
         switch (byteToInt(b[21])){
-            case(0):
-                return targetAgentMode.CONNECTED;
             case(1):
+                return targetAgentMode.CONNECTED;
+            case(0):
                 return targetAgentMode.DISCONNECTED;
             default:
                 return targetAgentMode.INVALID;

@@ -1,5 +1,7 @@
 package com.schwipps.DSFBuilder;
 
+import com.schwipps.DSFBuilder.enums.targetAgentRequestCommand;
+
 import java.nio.ByteBuffer;
 
 public class DSFBodyTargetAgentRequestMessage extends DSFBody {
@@ -7,24 +9,11 @@ public class DSFBodyTargetAgentRequestMessage extends DSFBody {
     TargetAgentId 0-255 1Byte uint
     Command       0,1,2 1Byte
     */
-    public enum targetAgentRequestCommand{
-        PRESENCE_CHECK(0),
-        CONNECT_TO_TARGET_AGENT(1),
-        DISCONNECT_FROM_TARGET_AGENT(2);
-
-        private final int i;
-        targetAgentRequestCommand(int i) {
-            this.i = i;
-        }
-        public int getValue(){
-            return i;
-        }
-    }
 
     public DSFBodyTargetAgentRequestMessage(byte[] b){
         super(b);
     }
-    public DSFBodyTargetAgentRequestMessage(int targetAgentId,targetAgentRequestCommand command){
+    public DSFBodyTargetAgentRequestMessage(int targetAgentId, targetAgentRequestCommand command){
         super(new byte[2]);
         setTargetAgentId(targetAgentId);
         setCommand(command);
