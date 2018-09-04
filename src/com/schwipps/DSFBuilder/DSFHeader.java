@@ -4,12 +4,13 @@ import java.nio.ByteBuffer;
 
 public class DSFHeader {
     /* Header Structure 8Byte
-    // InstanceID       0-65,535    2Byte uint
-    // MessageType      0-65,535    2Byte uint
-    // MessageLength    0-65,535    2Byte uint
-    // AckRequired                  1Bit
-    // IDDVersion       0-127       7bit uint
-    // CheksumSize      0,2,4       2bit
+    0   InstanceID       2Byte uint  0-65,535
+    2   MessageType      2Byte uint  0-65,535
+    4   MessageLength    2Byte uint  0-65,535
+    6   AckRequired      1Bit
+    6.1 IDDVersion       7bit  uint  0-127
+    7   CheksumSize      2bit        0,2,4
+    7.2 Reserved
     */
 
 

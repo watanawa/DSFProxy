@@ -26,24 +26,18 @@ public class DSFBodyTargetAgentRequestMessage extends DSFBody {
     }
     public DSFBodyTargetAgentRequestMessage(int targetAgentId,targetAgentRequestCommand command){
         super(new byte[2]);
-        b[0] = ByteBuffer.allocate(4).putInt(targetAgentId).array()[3];
-        b[1] = ByteBuffer.allocate(4).putInt(command.getValue()).array()[3];
+        setTargetAgentId(targetAgentId);
+        setCommand(command);
     }
     public int getTargetAgentId(){
-        byte temp[] = new byte[4];
-        temp[0] = 0x00;
-        temp[1] = 0x00;
-        temp[2] = 0x00;
-        temp[3] = b[0];
-        return ByteBuffer.wrap(temp).getInt();
+        return byteToInt(b[0]);
+    }
+
+    public void setTargetAgentId(int targetAgentId){
+        b[0] = ByteBuffer.allocate(4).putInt(targetAgentId).array()[3];
     }
     public targetAgentRequestCommand getCommand(){
-        byte temp[] = new byte[4];
-        temp[0] = 0x00;
-        temp[1] = 0x00;
-        temp[2] = 0x00;
-        temp[3] = b[1];
-        switch(ByteBuffer.wrap(temp).getInt()){
+        switch(byteToInt(b[1])){
             case(0):
                 return targetAgentRequestCommand.PRESENCE_CHECK;
             case(1):
@@ -54,5 +48,7 @@ public class DSFBodyTargetAgentRequestMessage extends DSFBody {
         //should not happen
         return null;
     }
-
+    public void setCommand(targetAgentRequestCommand command){
+        b[1] = intToByte(command.getValue())[3];
+    }
 }

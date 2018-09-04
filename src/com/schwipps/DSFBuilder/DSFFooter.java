@@ -3,6 +3,10 @@ package com.schwipps.DSFBuilder;
 import java.nio.ByteBuffer;
 
 public class DSFFooter {
+	/* 	Footer Structure
+	0	Checksum 0/2/4 Byte uint
+	*/
+
 	private byte[] b;
 	
 	public DSFFooter(byte[] b) {
