@@ -1,7 +1,5 @@
 package com.schwipps.DSFBuilder;
 
-import org.codehaus.groovy.tools.shell.Command;
-
 import java.nio.ByteBuffer;
 
 public class DSFBodyTargetAgentRequestMessage extends DSFBody {

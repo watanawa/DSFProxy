@@ -3,8 +3,6 @@ package com.schwipps.Test.DSFBuilder;
 import com.schwipps.DSFBuilder.*;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class DSFMessageTest {
 
     @Test

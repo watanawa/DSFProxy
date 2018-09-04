@@ -4,7 +4,6 @@ import com.schwipps.DSFBuilder.*;
 import com.schwipps.dsf.TypeEquipmentDescription;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 
 
 public class Main {

@@ -1,7 +1,6 @@
 package com.schwipps.DSFBuilder;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class DSFMessage {
     private DSFHeader head;

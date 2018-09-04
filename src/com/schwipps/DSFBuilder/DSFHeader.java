@@ -1,8 +1,6 @@
 package com.schwipps.DSFBuilder;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class DSFHeader {
     /* Header Structure 8Byte

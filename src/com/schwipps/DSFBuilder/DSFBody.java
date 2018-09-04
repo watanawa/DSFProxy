@@ -3,7 +3,7 @@ package com.schwipps.DSFBuilder;
 import java.nio.ByteBuffer;
 
 public class DSFBody {
-	private byte[] b;
+	protected byte[] b;
 	
 	public DSFBody(byte[] b)
 	{
