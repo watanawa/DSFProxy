@@ -1,6 +1,7 @@
 package com.schwipps.Test.DSFBuilder;
 
 import com.schwipps.DSFBuilder.DSFHeader;
+import com.schwipps.DSFBuilder.enums.MessageType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,10 +10,10 @@ class DSFHeaderTest {
 
     @Test
     void dsfHeader(){
-        DSFHeader head = new DSFHeader(1,2,3,true,4,4);
+        DSFHeader head = new DSFHeader(1, MessageType.TARGET_AGENT_DATA_MESSAGE,3,true,4,4);
 
         Assertions.assertEquals(1,head.getInstanceID());
-        Assertions.assertEquals(2,head.getMessageType());
+        Assertions.assertEquals(MessageType.TARGET_AGENT_DATA_MESSAGE,head.getMessageType());
         Assertions.assertEquals(3,head.getMessageLength());
         Assertions.assertEquals(true,head.getAckRequired());
         Assertions.assertEquals(4,head.getIDDVersion());
@@ -142,8 +143,8 @@ class DSFHeaderTest {
             b[i] = (byte) 0x00;
         }
         DSFHeader head = new DSFHeader(b);
-        head.setMessageType(400);
-        Assertions.assertEquals(400, head.getMessageType());
+        head.setMessageType(MessageType.DEBUG_DATA_MESSAGE);
+        Assertions.assertEquals(MessageType.DEBUG_DATA_MESSAGE, head.getMessageType());
     }
 
     @Test

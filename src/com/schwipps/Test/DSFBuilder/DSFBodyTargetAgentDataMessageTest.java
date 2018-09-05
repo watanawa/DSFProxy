@@ -1,11 +1,9 @@
 package com.schwipps.Test.DSFBuilder;
 
 import com.schwipps.DSFBuilder.DSFBodyTargetAgentDataMessage;
-import com.schwipps.DSFBuilder.enums.targetAgentMode;
+import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DSFBodyTargetAgentDataMessageTest {
     DSFBodyTargetAgentDataMessage targetAgentDataMessage;
@@ -41,7 +39,7 @@ class DSFBodyTargetAgentDataMessageTest {
 
     @Test
     void getLostClientRequestMessage() {
-        System.out.println(targetAgentDataMessage.getLostClientRequestMessage());
+        System.out.println(targetAgentDataMessage.getLostClientRequestMessages());
     }
 
     @Test
@@ -63,7 +61,7 @@ class DSFBodyTargetAgentDataMessageTest {
     void checkSetter() {
         int timeStamp = 0xFFFFFFFF;
         int targetAgentId = 12;
-        targetAgentMode mode = targetAgentMode.CONNECTED;
+        TargetAgentMode mode = TargetAgentMode.CONNECTED;
         int maxUtilization = 42;
         int lostClientRequestMessages = 30;
         int rxBufferSize = 5000;
@@ -74,7 +72,7 @@ class DSFBodyTargetAgentDataMessageTest {
         targetAgentDataMessage.setTargetAgentId(targetAgentId);
         targetAgentDataMessage.setMode(mode);
         targetAgentDataMessage.setMaxUtilization(maxUtilization);
-        targetAgentDataMessage.setLostClientRequestMessage(lostClientRequestMessages);
+        targetAgentDataMessage.setLostClientRequestMessages(lostClientRequestMessages);
         targetAgentDataMessage.setRXBufferSize(rxBufferSize);
         targetAgentDataMessage.setTXBufferSize(txBufferSize);
         targetAgentDataMessage.setMaxSamplingFrequency(maxSamplingFrequency);
@@ -83,7 +81,7 @@ class DSFBodyTargetAgentDataMessageTest {
         System.out.println(targetAgentDataMessage.getTargetAgentId());
         System.out.println(targetAgentDataMessage.getMode().toString());
         System.out.println(targetAgentDataMessage.getMaxUtilization());
-        System.out.println(targetAgentDataMessage.getLostClientRequestMessage());
+        System.out.println(targetAgentDataMessage.getLostClientRequestMessages());
         System.out.println(targetAgentDataMessage.getRXBufferSize());
         System.out.println(targetAgentDataMessage.getTXBufferSize());
         System.out.println(targetAgentDataMessage.getMaxSamplingFrequency());

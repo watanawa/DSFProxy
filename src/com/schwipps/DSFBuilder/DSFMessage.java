@@ -1,5 +1,7 @@
 package com.schwipps.DSFBuilder;
 
+import com.schwipps.DSFBuilder.enums.MessageType;
+
 import java.nio.ByteBuffer;
 
 public class DSFMessage {
@@ -7,22 +9,6 @@ public class DSFMessage {
     private DSFBody body;
     private DSFFooter footer;
 
-    public enum messageType {
-        TARGET_AGENT_REQUEST_MESSAGE(10000),
-        TARGET_AGENT_DATA_MESSAGE(10001),
-        DEBUG_DATA_READ_REQUEST_MESSAGE(10004),
-        DEBUG_DATA_WRITE_REQUEST_MESSAGE(10013),
-        DEBUG_DATA_MESSAGE(10005),
-        INVALID_MESSAGE_HANDLE(42);
-        private final int i;
-        messageType(int i) {
-            this.i = i;
-        }
-        public int getValue(){
-            return i;
-        }
-
-    }
 
     public DSFMessage(DSFHeader head, DSFBody body, DSFFooter footer) {
         this.head = head;
@@ -82,18 +68,18 @@ public class DSFMessage {
         this.footer = footer;
     }
 
-    public messageType getMessageType(){
-        switch(head.getMessageType()){
-            case(10000): return messageType.TARGET_AGENT_REQUEST_MESSAGE;
-            case(10001): return messageType.TARGET_AGENT_DATA_MESSAGE;
-            case(10004): return messageType.DEBUG_DATA_READ_REQUEST_MESSAGE;
-            case(10013): return messageType.DEBUG_DATA_WRITE_REQUEST_MESSAGE;
-            case(10005): return messageType.DEBUG_DATA_MESSAGE;
+    public MessageType getMessageType(){
+        switch(head.getMessageType().getValue()){
+            case(10000): return MessageType.TARGET_AGENT_REQUEST_MESSAGE;
+            case(10001): return MessageType.TARGET_AGENT_DATA_MESSAGE;
+            case(10004): return MessageType.DEBUG_DATA_READ_REQUEST_MESSAGE;
+            case(10013): return MessageType.DEBUG_DATA_WRITE_REQUEST_MESSAGE;
+            case(10005): return MessageType.DEBUG_DATA_MESSAGE;
         }
-        return messageType.INVALID_MESSAGE_HANDLE;
+        return MessageType.INVALID_MESSAGE_HANDLE;
     }
 
-    public boolean messageNoError(){
+    public boolean messageErrorFree(){
         byte[] calcSum = ByteBuffer.allocate(4).putInt(head.calculateChecksum()+body.calculateChecksum()).array();
         if(head.getChecksumSize() == 2){
             calcSum[0] = 0x00;

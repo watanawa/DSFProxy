@@ -1,5 +1,7 @@
 package com.schwipps.DSFBuilder;
 
+import com.schwipps.DSFBuilder.enums.MessageType;
+
 import java.nio.ByteBuffer;
 
 public class DSFHeader {
@@ -20,7 +22,7 @@ public class DSFHeader {
 		this.b = b;
 		// TODO Auto-generated constructor stub
 	}
-	public DSFHeader(int instanceID, int messageType, int messageLength, boolean ackRequired, int iddVersion, int checksumSize){
+	public DSFHeader(int instanceID, MessageType messageType, int messageLength, boolean ackRequired, int iddVersion, int checksumSize){
 	    b = new byte[8];
         setInstanceID(instanceID);
         setMessageType(messageType);
@@ -48,13 +50,17 @@ public class DSFHeader {
 		return ByteBuffer.wrap(intTemp).getInt();
 	}
 
-	public int getMessageType() {
+	public MessageType getMessageType() {
         byte[] intTemp = new byte[4];
         intTemp[1] = 0x00;
         intTemp[2] = 0x00;
         intTemp[2] = b[2];
         intTemp[3] = b[3];
-        return ByteBuffer.wrap(intTemp).getInt();
+        int val = ByteBuffer.wrap(intTemp).getInt();
+        for(MessageType messageType : MessageType.values()){
+            if(messageType.getValue() == val ) return  messageType;
+        }
+        return MessageType.INVALID_MESSAGE_HANDLE;
 	}
 	
 	public int getMessageLength() {
@@ -109,8 +115,8 @@ public class DSFHeader {
 
 	}
 	// 2Byte Uint 0-65,535
-	public void setMessageType(int val) {
-        byte[] valueByte = intToByte(val);
+	public void setMessageType(MessageType messageType) {
+        byte[] valueByte = intToByte(messageType.getValue());
         b[2] = valueByte[2];
         b[3] = valueByte[3];
 	}

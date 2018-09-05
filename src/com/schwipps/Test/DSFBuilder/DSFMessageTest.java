@@ -1,30 +1,33 @@
 package com.schwipps.Test.DSFBuilder;
 
 import com.schwipps.DSFBuilder.*;
-import com.schwipps.DSFBuilder.enums.targetAgentRequestCommand;
+import com.schwipps.DSFBuilder.enums.MessageType;
+import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import org.junit.jupiter.api.Test;
 
 class DSFMessageTest {
 
     @Test
     void getByte() {
-        DSFHeader header    = new DSFHeader(1,DSFMessage.messageType.TARGET_AGENT_REQUEST_MESSAGE.getValue(),3,true,10, 4);
-        DSFBody body        = new DSFBodyTargetAgentRequestMessage(1, targetAgentRequestCommand.CONNECT_TO_TARGET_AGENT);
+        DSFHeader header    = new DSFHeader(1, MessageType.TARGET_AGENT_DATA_MESSAGE,3,true,10, 4);
+        DSFBody body        = new DSFBodyTargetAgentDataMessage(2000,12,new byte[16], TargetAgentMode.CONNECTED,99,10,1000,2000,50);
         DSFFooter footer    = new DSFFooter(header.calculateChecksum()+body.calculateChecksum(),header.getChecksumSize());
 
         DSFMessage dsfMessage = new DSFMessage(header,body,footer);
 
         System.out.println(dsfMessage.getMessageType().toString());
-        if(dsfMessage.getBody() instanceof  DSFBodyTargetAgentRequestMessage){
-            System.out.println( ((DSFBodyTargetAgentRequestMessage)dsfMessage.getBody()).getCommand().toString());
+        if(dsfMessage.getBody() instanceof  DSFBodyTargetAgentDataMessage){
+            System.out.println( ((DSFBodyTargetAgentDataMessage)dsfMessage.getBody()).getMode().toString());
             System.out.println(footer.getChecksumNumber());
-            System.out.println(dsfMessage.messageNoError());
+            System.out.println(dsfMessage.messageErrorFree());
         }
 
     }
 
     @Test
     void getHead() {
+
+
     }
 
     @Test

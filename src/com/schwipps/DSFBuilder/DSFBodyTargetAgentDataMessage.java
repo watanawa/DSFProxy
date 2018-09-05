@@ -1,6 +1,6 @@
 package com.schwipps.DSFBuilder;
 
-import com.schwipps.DSFBuilder.enums.targetAgentMode;
+import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 
 import java.util.Arrays;
 
@@ -11,7 +11,7 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     5   Checksum                    16Byte  []
     21  Mode                        1Byte   []
     22  MaxUtilization              1Byte   int 0..100
-    23  LostClientRequestMessage    1Byte   uint
+    23  LostClientRequestMessages   1Byte   uint
     24  RXBufferSize                2Byte   uint
     26  TXBufferSize                2Byte   uint
     28  MaxSamplingFrequency        1Byte   uint
@@ -22,8 +22,26 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
         super(b);
     }
 
-    public DSFBodyTargetAgentDataMessage(){
+    public DSFBodyTargetAgentDataMessage(int                timeStamp,
+                                         int                targetAgentId,
+                                         byte[]             checkSum,
+                                         TargetAgentMode    mode,
+                                         int                maxUtilization,
+                                         int                lostClientRequestMessages,
+                                         int                rxBufferSize,
+                                         int                txBufferSize,
+                                         int                maxSamplingFrequency){
         super(new byte[29]);
+        setTimeStamp(timeStamp);
+        setTargetAgentId(targetAgentId);
+        setChecksum(checkSum);
+        setMode(mode);
+        setMaxUtilization(maxUtilization);
+        setLostClientRequestMessages(lostClientRequestMessages);
+        setRXBufferSize(rxBufferSize);
+        setTXBufferSize(txBufferSize);
+        setMaxSamplingFrequency(maxSamplingFrequency);
+
     }
     // Field getter
     public int getTimeStamp(){
@@ -35,20 +53,20 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     public byte[] getChecksum(){
         return Arrays.copyOfRange(b,5,21);
     }
-    public targetAgentMode getMode(){
+    public TargetAgentMode getMode(){
         switch (byteToInt(b[21])){
             case(1):
-                return targetAgentMode.CONNECTED;
+                return TargetAgentMode.CONNECTED;
             case(0):
-                return targetAgentMode.DISCONNECTED;
+                return TargetAgentMode.DISCONNECTED;
             default:
-                return targetAgentMode.INVALID;
+                return TargetAgentMode.INVALID;
         }
     }
     public int getMaxUtilization(){
         return byteToInt(b[22]);
     }
-    public int getLostClientRequestMessage(){
+    public int getLostClientRequestMessages(){
         return byteToInt(b[23]);
     }
     public int getRXBufferSize(){
@@ -76,11 +94,15 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     }
     public void setChecksum(byte[] checkSum){
         int offset = 5;
-        for(int i = 0; i< 16; i++){
+        if(checkSum.length != 16){
+            //TODO
+        }
+
+        for(int i = 0; i< checkSum.length; i++){
             b[i+offset] = checkSum[i];
         }
     }
-    public void setMode(targetAgentMode mode){
+    public void setMode(TargetAgentMode mode){
         switch(mode){
             case CONNECTED:
                 b[21] = intToByte(mode.getValue())[3];
@@ -93,7 +115,7 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     public void setMaxUtilization(int utilization){
             b[22] = intToByte(utilization)[3];
     }
-    public void setLostClientRequestMessage(int lostClientRequestMessages){
+    public void setLostClientRequestMessages(int lostClientRequestMessages){
             b[23] = intToByte(lostClientRequestMessages)[3];
     }
     public void setRXBufferSize(int rxBufferSize){
