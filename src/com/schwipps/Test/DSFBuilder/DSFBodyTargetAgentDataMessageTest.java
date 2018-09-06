@@ -77,7 +77,7 @@ class DSFBodyTargetAgentDataMessageTest {
         targetAgentDataMessage.setTXBufferSize(txBufferSize);
         targetAgentDataMessage.setMaxSamplingFrequency(maxSamplingFrequency);
 
-        System.out.println(Integer.toUnsignedLong(targetAgentDataMessage.getTimeStamp()) );
+        System.out.println((targetAgentDataMessage.getTimeStamp()) );
         System.out.println(targetAgentDataMessage.getTargetAgentId());
         System.out.println(targetAgentDataMessage.getMode().toString());
         System.out.println(targetAgentDataMessage.getMaxUtilization());

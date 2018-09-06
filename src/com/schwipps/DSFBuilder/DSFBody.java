@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class DSFBody {
 	protected byte[] b;
 	
-	public DSFBody(byte[] b)
+	protected DSFBody(byte[] b)
 	{
 		this.b = b;
 	}
@@ -60,7 +60,7 @@ public class DSFBody {
 	protected byte[] intToByte(int val){
 		return ByteBuffer.allocate(4).putInt(val).array();
 	}
-	protected byte[] longToByte(int val){
+	protected byte[] longToByte(long val){
 		return ByteBuffer.allocate(8).putLong(val).array();
 	}
 

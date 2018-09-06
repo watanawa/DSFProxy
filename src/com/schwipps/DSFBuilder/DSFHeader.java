@@ -20,7 +20,6 @@ public class DSFHeader {
     //+++++Constructors+++++
 	public DSFHeader(byte[] b) {
 		this.b = b;
-		// TODO Auto-generated constructor stub
 	}
 	public DSFHeader(int instanceID, MessageType messageType, int messageLength, boolean ackRequired, int iddVersion, int checksumSize){
 	    b = new byte[8];
