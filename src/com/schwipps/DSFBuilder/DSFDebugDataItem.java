@@ -31,6 +31,9 @@ public class DSFDebugDataItem {
 
     }
 
+    public byte[] getByte(){
+        return b;
+    }
 
     public int getDataLength(){
         byte[] temp = {0x00, 0x00,0x00,b[0]};
@@ -44,7 +47,10 @@ public class DSFDebugDataItem {
     }
 
     public byte[] getData(){
-       return Arrays.copyOfRange(b,5,b.length+1);
+        if(b.length == 5) {
+            return null;
+        }
+        return Arrays.copyOfRange(b,5,b.length+1);
     }
 
     public void setDataLength(int dataLength){

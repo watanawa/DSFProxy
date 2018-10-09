@@ -19,10 +19,12 @@ public class DSFBodyDebugDataReadRequest extends DSFBody{
     ...
     */
 
+
+
     public DSFBodyDebugDataReadRequest (byte[] b){
         super(b);
     }
-    public DSFBodyDebugDataReadRequest (int targetAgentId, DebugDataReadRequestCommand command ){
+    public DSFBodyDebugDataReadRequest (int targetAgentId, DebugDataReadRequestCommand command, DSFDebugDataItem[] debugDataItems){
         super(new byte[1]);
         //TODO
     }
