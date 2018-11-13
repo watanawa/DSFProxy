@@ -3,6 +3,7 @@ package com.schwipps.DSFBuilder;
 import com.schwipps.DSFBuilder.enums.MessageType;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class DSFMessage {
     private DSFHeader head;
@@ -16,15 +17,13 @@ public class DSFMessage {
         this.footer = footer;
     }
 
-    /*
+
     public DSFMessage(byte[] b) {
         //Seperates the bytes into header+body+footer and fills the byte into the corresponding fields
-        setHead(new DSFHeader(Arrays.copyOfRange(b, 0, head.getLength())));
+        setHead(new DSFHeader(Arrays.copyOfRange(b, 0, 8)));
         setBody(new DSFBody(Arrays.copyOfRange(b, head.getLength(), head.getLength()+head.getMessageLength())));
         setFooter(new DSFFooter(Arrays.copyOfRange(b, head.getLength()+head.getMessageLength(), head.getLength()+head.getMessageLength()+head.getChecksumSize())));
-    }*/
-
-
+    }
 
     public byte[] getByte() {
         //Assembles head+body+footer

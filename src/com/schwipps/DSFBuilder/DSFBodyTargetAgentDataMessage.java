@@ -22,7 +22,7 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
         super(b);
     }
 
-    public DSFBodyTargetAgentDataMessage(long                timeStamp,
+    public DSFBodyTargetAgentDataMessage(long               timeStamp,
                                          int                targetAgentId,
                                          byte[]             checkSum,
                                          TargetAgentMode    mode,
@@ -84,9 +84,11 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     public void setTimeStamp(long timeStamp){
         byte[] temp= longToByte(timeStamp);
 
+        System.arraycopy(temp,4,b,0,4);
+        /*
         for(int i = 0; i< 4; i++){
             b[i] = temp[4+i];
-        }
+        }*/
     }
 
     public void setTargetAgentId(int targetAgentId){

@@ -59,7 +59,7 @@ class DSFBodyTargetAgentDataMessageTest {
 
     @Test
     void checkSetter() {
-        int timeStamp = 0xFFFFFFFF;
+        int timeStamp = 0xF;
         int targetAgentId = 12;
         TargetAgentMode mode = TargetAgentMode.CONNECTED;
         int maxUtilization = 42;

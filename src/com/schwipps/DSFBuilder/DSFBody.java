@@ -47,14 +47,18 @@ public class DSFBody {
 		return ByteBuffer.wrap(temp).getInt();
 	}
 	protected long byteToLong(byte[] bArray){
-		byte[] temp = new byte[8];
+		byte[] temp = new byte[Long.BYTES];
 
-		for(int i = 0; i < 8; i++){
-			if(i< bArray.length) temp[7-i] = bArray[i];
+		for(int i = 0; i < Long.BYTES; i++){
+			if(i < Long.BYTES-bArray.length ){
+				temp[i] = 0x00;
+			}
+			// i has reached the first index which should be copied
 			else{
-				temp[7-i] = 0x00;
+				temp[i] = bArray[i-bArray.length];
 			}
 		}
+
 		return ByteBuffer.wrap(temp).getLong();
 	}
 	protected byte[] intToByte(int val){
