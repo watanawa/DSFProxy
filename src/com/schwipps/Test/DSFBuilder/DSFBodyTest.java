@@ -12,7 +12,7 @@ class DSFBodyTest {
         int number = 2094967295;
 
         DSFBody body = new DSFBody(null);
-        System.out.println(body.byteToInt(body.intToByte(number)));
+        //System.out.println(body.byteToInt(body.intToByte(number)));
     }
 
 
@@ -29,6 +29,6 @@ class DSFBodyTest {
         long number = 3432094967295L;
 
         DSFBody body = new DSFBody(null);
-        System.out.println(body.byteToLong(body.longToByte(number)));
+        //System.out.println(body.byteToLong(body.longToByte(number)));
     }
 }
