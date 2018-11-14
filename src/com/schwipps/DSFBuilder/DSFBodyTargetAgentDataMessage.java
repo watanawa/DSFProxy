@@ -90,17 +90,13 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
             b[i] = temp[4+i];
         }*/
     }
-
     public void setTargetAgentId(int targetAgentId){
         b[4] = intToByte(targetAgentId)[3];
     }
     public void setChecksum(byte[] checkSum){
         int offset = 5;
-        if(checkSum.length != 16){
-            //TODO
-        }
 
-        for(int i = 0; i< checkSum.length; i++){
+        for(int i = 0; i< 16; i++){
             b[i+offset] = checkSum[i];
         }
     }

@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class DSFBody {
 	protected byte[] b;
 	
-	protected DSFBody(byte[] b)
+	public DSFBody(byte[] b)
 	{
 		this.b = b;
 	}
@@ -29,16 +29,17 @@ public class DSFBody {
 	}
 
 	protected int byteToInt(byte[] bArray){
-		byte[] temp = new byte[4];
-		for(int i = 0; i < 4; i++){
-			if(i< bArray.length)temp[3-i] = bArray[bArray.length - i -1];
-			else{
-				temp[3-i] = 0x00;
-			}
+		byte[] temp = new byte[Integer.BYTES]; //ZERO INITIALIZED AUTOMATICALLY
+		if(bArray.length <= Integer.BYTES){
+			System.arraycopy(bArray,0,temp,Integer.BYTES-bArray.length,bArray.length);
+		}
+		else{
+			throw new IllegalArgumentException("Argument may not be longer than "+Integer.BYTES+" Byte");
 		}
 		return ByteBuffer.wrap(temp).getInt();
 	}
 	protected int byteToInt(byte b){
+		//Returns the unsigned int value
 		byte[] temp = new byte[4];
 		temp[0] = 0x00;
 		temp[1] = 0x00;
@@ -48,7 +49,12 @@ public class DSFBody {
 	}
 	protected long byteToLong(byte[] bArray){
 		byte[] temp = new byte[Long.BYTES];
-
+		if(bArray.length <= Long.BYTES){
+			System.arraycopy(bArray,0,temp,Long.BYTES-bArray.length,bArray.length);
+		}
+		else{
+			throw new IllegalArgumentException("Argument may not be longer than "+Long.BYTES+" Byte");
+		}/*
 		for(int i = 0; i < Long.BYTES; i++){
 			if(i < Long.BYTES-bArray.length ){
 				temp[i] = 0x00;
@@ -57,7 +63,7 @@ public class DSFBody {
 			else{
 				temp[i] = bArray[i-bArray.length];
 			}
-		}
+		}*/
 
 		return ByteBuffer.wrap(temp).getLong();
 	}

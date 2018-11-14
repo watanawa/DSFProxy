@@ -42,7 +42,6 @@ public class DSFDebugDataItem {
 
     public long getDataItemAdress(){
         byte[] temp = {0x00, 0x00,0x00,0x00,b[1],b[2],b[3],b[4]};
-
         return ByteBuffer.wrap(temp).getLong();
     }
 

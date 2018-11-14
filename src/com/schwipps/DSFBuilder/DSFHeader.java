@@ -10,7 +10,7 @@ public class DSFHeader {
     2   MessageType      2Byte uint  0-65,535
     4   MessageLength    2Byte uint  0-65,535
     6   AckRequired      1Bit
-    6.1 IDDVersion       7bit  uint  0-127
+    6.1 IDDVersion       7bit  uint  0-127 ALWAYS 2
     7   CheksumSize      2bit        0,2,4
     7.2 Reserved
     */
@@ -148,7 +148,11 @@ public class DSFHeader {
 	}
 	
 	public void setChecksumSize(int val) {
-        byte temp = b[7];
+        // Sets the first two bit of the 7th byte
+        // 00 no Checksum
+        // 01 2 Byte Checksum
+        // 10 4 Byte Checksum
+	    byte temp = b[7];
 	    switch (val){
             case(0):
                 temp &= 0x3F; // 0011 1111

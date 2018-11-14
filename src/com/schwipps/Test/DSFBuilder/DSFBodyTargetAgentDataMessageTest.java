@@ -59,7 +59,7 @@ class DSFBodyTargetAgentDataMessageTest {
 
     @Test
     void checkSetter() {
-        int timeStamp = 0xF;
+        int timeStamp = 2000;
         int targetAgentId = 12;
         TargetAgentMode mode = TargetAgentMode.CONNECTED;
         int maxUtilization = 42;
@@ -85,6 +85,18 @@ class DSFBodyTargetAgentDataMessageTest {
         System.out.println(targetAgentDataMessage.getRXBufferSize());
         System.out.println(targetAgentDataMessage.getTXBufferSize());
         System.out.println(targetAgentDataMessage.getMaxSamplingFrequency());
+
+        targetAgentDataMessage = new DSFBodyTargetAgentDataMessage(targetAgentDataMessage.getByte());
+
+        System.out.println((targetAgentDataMessage.getTimeStamp()) );
+        System.out.println(targetAgentDataMessage.getTargetAgentId());
+        System.out.println(targetAgentDataMessage.getMode().toString());
+        System.out.println(targetAgentDataMessage.getMaxUtilization());
+        System.out.println(targetAgentDataMessage.getLostClientRequestMessages());
+        System.out.println(targetAgentDataMessage.getRXBufferSize());
+        System.out.println(targetAgentDataMessage.getTXBufferSize());
+        System.out.println(targetAgentDataMessage.getMaxSamplingFrequency());
+
     }
 
 }
