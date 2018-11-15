@@ -12,9 +12,6 @@ public class DSFDebugDataItem {
     */
 
     private byte[] b;
-
-
-
     public DSFDebugDataItem(byte[] b){
         this.b = b;
     }

@@ -50,7 +50,7 @@ public class DSFBodyTargetAgentDataMessage extends  DSFBody{
     public int getTargetAgentId(){
         return byteToInt(b[4]);
     }
-    public byte[] getChecksum(){
+    public byte[] getMD5Checksum(){
         return Arrays.copyOfRange(b,5,21);
     }
     public TargetAgentMode getMode(){

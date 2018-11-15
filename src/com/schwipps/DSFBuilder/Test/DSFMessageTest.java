@@ -1,4 +1,4 @@
-package com.schwipps.Test.DSFBuilder;
+package com.schwipps.DSFBuilder.Test;
 
 import com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
@@ -12,7 +12,7 @@ class DSFMessageTest {
 
         DSFHeader header    = new DSFHeader(1, MessageType.TARGET_AGENT_DATA_MESSAGE,29,true,10, 4);
         DSFBody body        = new DSFBodyTargetAgentDataMessage(2000,12,new byte[16], TargetAgentMode.CONNECTED,99,10,1000,2000,50);
-        DSFFooter footer    = new DSFFooter(header.calculateChecksum()+body.calculateChecksum(),header.getChecksumSize());
+        DSFFooter footer    = new DSFFooter(header.getChecksum()+body.getChecksum(),header.getChecksumSize());
 
         DSFMessage dsfMessage = new DSFMessage(header,body,footer);
 
@@ -28,7 +28,7 @@ class DSFMessageTest {
     void testDSFMessageWithByteArgument() {
         DSFHeader header = new DSFHeader(1, MessageType.TARGET_AGENT_DATA_MESSAGE, 29, true, 2, 4);
         DSFBody body = new DSFBodyTargetAgentDataMessage(2000, 12, new byte[16], TargetAgentMode.CONNECTED, 99, 10, 1000, 2000, 50);
-        DSFFooter footer = new DSFFooter(header.calculateChecksum() + body.calculateChecksum(), header.getChecksumSize());
+        DSFFooter footer = new DSFFooter(header.getChecksum() + body.getChecksum(), header.getChecksumSize());
 
         int length = header.getLength() + header.getMessageLength() + header.getChecksumSize();
 

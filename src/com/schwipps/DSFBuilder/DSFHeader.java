@@ -173,7 +173,7 @@ public class DSFHeader {
 	    return ByteBuffer.allocate(4).putInt(val).array();
     }
 
-    public int calculateChecksum(){
+    public int getChecksum(){
         int sum = 0;
         byte[] temp = new byte[4];
         temp[0] = 0x00;

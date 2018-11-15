@@ -1,7 +1,6 @@
-package com.schwipps.Test.DSFBuilder;
+package com.schwipps.DSFBuilder.Test;
 
 import com.schwipps.DSFBuilder.DSFHeader;
-import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

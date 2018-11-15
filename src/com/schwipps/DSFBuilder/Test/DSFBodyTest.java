@@ -1,9 +1,7 @@
-package com.schwipps.Test.DSFBuilder;
+package com.schwipps.DSFBuilder.Test;
 
 import com.schwipps.DSFBuilder.DSFBody;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DSFBodyTest {
 

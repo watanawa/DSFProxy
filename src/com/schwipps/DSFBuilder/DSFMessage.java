@@ -79,11 +79,16 @@ public class DSFMessage {
     }
 
     public boolean messageErrorFree(){
-        byte[] calcSum = ByteBuffer.allocate(4).putInt(head.calculateChecksum()+body.calculateChecksum()).array();
-        if(head.getChecksumSize() == 2){
-            calcSum[0] = 0x00;
-            calcSum[1] = 0x00;
+        if(head.getChecksumSize() == 0){
+            return true;
         }
-        return ByteBuffer.wrap(calcSum).getInt() == footer.getChecksumNumber();
+        else {
+            byte[] calcSum = ByteBuffer.allocate(4).putInt(head.getChecksum() + body.getChecksum()).array();
+            if (head.getChecksumSize() == 2) {
+                calcSum[0] = 0x00;
+                calcSum[1] = 0x00;
+            }
+            return ByteBuffer.wrap(calcSum).getInt() == footer.getChecksumNumber();
+        }
     }
 }

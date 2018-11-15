@@ -1,11 +1,9 @@
-package com.schwipps.Test.DSFBuilder;
+package com.schwipps.DSFBuilder.Test;
 
 import com.schwipps.DSFBuilder.DSFDebugDataItem;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DSFDebugDataItemTest {
 

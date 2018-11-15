@@ -1,4 +1,4 @@
-package com.schwipps.Test.DSFBuilder;
+package com.schwipps.DSFBuilder.Test;
 
 import com.schwipps.DSFBuilder.DSFBodyTargetAgentDataMessage;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
@@ -24,7 +24,7 @@ class DSFBodyTargetAgentDataMessageTest {
 
     @Test
     void getChecksum() {
-        System.out.println(targetAgentDataMessage.getChecksum().toString());
+        System.out.println(targetAgentDataMessage.getChecksum());
     }
 
     @Test

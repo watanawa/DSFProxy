@@ -14,7 +14,7 @@ public class DSFBody {
 	public byte[] getByte() {
 		return b;
 	}
-	public int calculateChecksum(){
+	public int getChecksum(){
 		int sum = 0;
 		byte[] temp = new byte[4];
 		temp[0] = 0x00;
