@@ -54,16 +54,7 @@ public class DSFBody {
 		}
 		else{
 			throw new IllegalArgumentException("Argument may not be longer than "+Long.BYTES+" Byte");
-		}/*
-		for(int i = 0; i < Long.BYTES; i++){
-			if(i < Long.BYTES-bArray.length ){
-				temp[i] = 0x00;
-			}
-			// i has reached the first index which should be copied
-			else{
-				temp[i] = bArray[i-bArray.length];
-			}
-		}*/
+		}
 
 		return ByteBuffer.wrap(temp).getLong();
 	}

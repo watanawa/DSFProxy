@@ -3,36 +3,37 @@ import  com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import com.schwipps.DSFBuilder.enums.TargetAgentRequestCommand;
-import com.schwipps.dsf.TypeDebugSymbolSet;
+import com.schwipps.Main.DSFAddressLinker;
 
 import java.util.Arrays;
 
 public class MessageHandler {
 
-    private static boolean connectedToTargetAgent = false;
-    private static int targetAgentID = 0;
+    private  boolean connectedToTargetAgent = false;
+    private  int targetAgentID = 0;
 
-    private static UDPSenderTargetAgent udpSenderTargetAgent;
-    private static UDPSenderClient udpSenderClient;
-    private static TypeDebugSymbolSet typeDebugSymbolSet;
+    private  UDPSenderTargetAgent udpSenderTargetAgent;
+    private  UDPSenderClient udpSenderClient;
+    private  DSFAddressLinker dsfAddressLinker;
 
-    public static void setUdpSenderTargetAgent(UDPSenderTargetAgent udpSenderTargetAgentArgument){
+
+    public void setUdpSenderTargetAgent(UDPSenderTargetAgent udpSenderTargetAgentArgument){
         udpSenderTargetAgent = udpSenderTargetAgentArgument;
     }
-    public static void setUdpSenderClient(UDPSenderClient udpSenderClientArg){
+    public void setUdpSenderClient(UDPSenderClient udpSenderClientArg){
         udpSenderClient = udpSenderClientArg;
     }
-    public static void setTypeDebugSymbolSet(TypeDebugSymbolSet typeDebugSymbolSetArgument){
-        typeDebugSymbolSet = typeDebugSymbolSetArgument;
+    public void setDSFAddressLinker(DSFAddressLinker dsfAddressLinkerArg){
+        dsfAddressLinker = dsfAddressLinkerArg;
     }
-    public static UDPSenderClient getUdpSenderClient(){
+    public  UDPSenderClient getUdpSenderClient(){
         return udpSenderClient;
     }
-    public static UDPSenderTargetAgent getUdpSenderTargetAgent(){
+    public  UDPSenderTargetAgent getUdpSenderTargetAgent(){
         return udpSenderTargetAgent;
     }
 
-    public static void handleMessageTargetAgent(byte message[], int offset, int length){
+    public void handleMessageTargetAgent(byte message[], int offset, int length){
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);;
         DSFMessage dsfMessage = new DSFMessage(temp);
 
@@ -53,7 +54,7 @@ public class MessageHandler {
 
         }
     }
-    public static void handleTargetAgentDataMessage(DSFMessage dsfMessage){
+    public void handleTargetAgentDataMessage(DSFMessage dsfMessage){
         DSFBodyTargetAgentDataMessage targetAgentDataMessage = new DSFBodyTargetAgentDataMessage(dsfMessage.getBody().getByte());
         if(!connectedToTargetAgent){
             if(targetAgentDataMessage.getMode().equals(TargetAgentMode.CONNECTED)){
@@ -76,10 +77,11 @@ public class MessageHandler {
 
     }
 
-    public static void handleDebugDataMessage(DSFMessage dsfMessage){
+    public void handleDebugDataMessage(DSFMessage dsfMessage){
         //TODO
     }
-    public static void handleMessageClient(byte message[], int offset, int length) {
+    public void handleMessageClient(byte message[], int offset, int length) {
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);
+        //TODO
     }
 }

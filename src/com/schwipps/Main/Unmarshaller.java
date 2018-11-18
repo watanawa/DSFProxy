@@ -11,7 +11,7 @@ import java.io.File;
 
 public class Unmarshaller {
 
-    TypeEquipmentDescription unmarshal(File f) {
+    public TypeEquipmentDescription unmarshal(File f) {
         try {
             JAXBContext jc = JAXBContext.newInstance(ObjectFactory.class);
             javax.xml.bind.Unmarshaller jcUnmarshaller = jc.createUnmarshaller();
@@ -30,7 +30,6 @@ public class Unmarshaller {
 
             return null;
         } catch (JAXBException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }

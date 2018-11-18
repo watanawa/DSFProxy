@@ -9,6 +9,7 @@ public class UDPReceiverClient implements Runnable {
     private DatagramSocket socket;
     private boolean running;
     private byte[] buffer;
+    private MessageHandler messageHandler;
 
     public UDPReceiverClient(DatagramSocket socket){
         this.socket = socket;
@@ -26,8 +27,16 @@ public class UDPReceiverClient implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            MessageHandler.handleMessageClient(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength());
+            messageHandler.handleMessageClient(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength());
         }
         running = false;
+    }
+
+    public MessageHandler getMessageHandler() {
+        return messageHandler;
+    }
+
+    public void setMessageHandler(MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
     }
 }
