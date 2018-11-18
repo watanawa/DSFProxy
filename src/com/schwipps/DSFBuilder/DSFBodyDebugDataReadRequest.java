@@ -2,6 +2,8 @@ package com.schwipps.DSFBuilder;
 
 import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
 
+import java.util.Arrays;
+
 public class DSFBodyDebugDataReadRequest extends DSFBody{
     /* Structure
     0   TargetAgentID   1Byte   uint
@@ -25,8 +27,46 @@ public class DSFBodyDebugDataReadRequest extends DSFBody{
         super(b);
     }
     public DSFBodyDebugDataReadRequest (int targetAgentId, DebugDataReadRequestCommand command, DSFDebugDataItem[] debugDataItems){
-        super(new byte[1]);
-        //TODO
+        super(new byte[2+ debugDataItems.length*5]);
+        setTargetAgentId(targetAgentId);
+        setDebugDataReadRequestCommand(command);
+        setDebugDataItems(debugDataItems);
     }
 
+    private void setTargetAgentId(int id){
+        b[0] = intToByte(id)[3];
+    }
+    private void setDebugDataReadRequestCommand(DebugDataReadRequestCommand command){
+        b[1] = intToByte(command.getValue())[3];
+    }
+    private void setDebugDataItems(DSFDebugDataItem[] debugDataItems){
+        for(int i = 0; i < debugDataItems.length; i++){
+            if(debugDataItems[i] != null){
+                    b[2 + 5 * i] = intToByte(debugDataItems[i].getDataLength())[3];
+                    System.arraycopy(longToByte(debugDataItems[i].getDataItemAdress()), 4, b, 3 + 5 * i, 4);
+
+            }
+        }
+    }
+
+    public int getTargetAgentId(){
+        return byteToInt(b[0]);
+    }
+    public DebugDataReadRequestCommand getDebugDataReadRequestCommand(){
+        switch (byteToInt(b[1])){
+            case (0): return DebugDataReadRequestCommand.READ_DATA_ONCE;
+            case (1): return DebugDataReadRequestCommand.READ_DATA_PERIODICALLY;
+            case (2): return DebugDataReadRequestCommand.CANCEL_ALL_PERIODIC_TRANSFERS;
+        }
+        return DebugDataReadRequestCommand.INVALID_COMMAND_HANDLE;
+    }
+
+    public DSFDebugDataItem[] getDebugDataItems(){
+        int debugDataItemsLength = (b.length-2)/5;
+        DSFDebugDataItem[] dsfDebugDataItems = new DSFDebugDataItem[debugDataItemsLength];
+        for(int i = 0; i < debugDataItemsLength; i++){
+            dsfDebugDataItems[i] = new DSFDebugDataItem(Arrays.copyOfRange(b,2+i*5 , 7+i*5));
+        }
+        return dsfDebugDataItems;
+    }
 }

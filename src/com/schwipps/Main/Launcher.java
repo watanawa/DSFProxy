@@ -1,5 +1,4 @@
 package com.schwipps.Main;
-
 import com.schwipps.UDP.*;
 import com.schwipps.dsf.TypeCommunicationLinks;
 import com.schwipps.dsf.TypeCompilationUnit;
@@ -13,9 +12,15 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+// Company: Airbus Defence and Space
+// Author:  Christoph Schwipps
+// Date:    November 2018
 
 public class Launcher {
+    String args[];
+
     private String equipmentDescriptionFile;
     TypeEquipmentDescription typeEquipmentDescription;
 
@@ -27,39 +32,36 @@ public class Launcher {
     UDPReceiverClient udpReceiverClient;
     UDPSenderClient udpSenderClient;
 
+    TargetAgentPresenceChecker targetAgentPresenceChecker;
 
+    public Launcher(String[] args){
+        this.args = args;
+    }
 
-    //STARTUP
+    //STARTUP [0] EquipmentdescriptionFile [1] Port of TargetAgentSocket [2] Port of ClientSocket
     public static void main(String[] args) {
-        Launcher launcher = new Launcher();
-        launcher.setEquipmentDescriptionFile(args[0]);
+        System.out.println("Launching DSF Proxy");
+        Launcher launcher = new Launcher(args);
+        launcher.setEquipmentDescriptionFile();
         launcher.unmarshall();
         launcher.createUDPSenderAndReceiver();
         launcher.initializeMessageHandler();
-
-
-
-        List<TypeCompilationUnit> list = launcher.getTypeEquipmentDescription().getDebugSymbols().getDebugSymbolSet().get(0).getCompilationUnit();
-
-        for(int i = 0; i < list.size(); i++){
-            if(list.get(i).getName().equals("NAV_BasicConsolidation")){
-                for(Object obj:list.get(i).getVariableAndCharacterDataTypeAndBooleanDataType()){
-                    System.out.println(obj.getClass());
-                }
-            }
-        }
+        launcher.startTargetAgentPresenceChecker();
 
         System.out.println("DSF Proxy succesfully started");
+
     }
 
-    public void setEquipmentDescriptionFile(String path){
-        equipmentDescriptionFile = path;
-    }
+
     public String getEquipmentDescriptionFile(){
         return equipmentDescriptionFile;
     }
     public TypeEquipmentDescription getTypeEquipmentDescription(){
         return typeEquipmentDescription;
+    }
+
+    public void setEquipmentDescriptionFile(){
+        equipmentDescriptionFile = args[0];
     }
     public void unmarshall(){
         Unmarshaller unmarshaller = new Unmarshaller();
@@ -67,18 +69,18 @@ public class Launcher {
     }
     public void createUDPSenderAndReceiver(){
         try {
-            socketForTargetAgent = new DatagramSocket(4001);
+            socketForTargetAgent = new DatagramSocket(Integer.valueOf(args[1]));
         } catch (SocketException e) {
             e.printStackTrace();
         }
         try {
-            socketForClient = new DatagramSocket(4002);
+            socketForClient = new DatagramSocket(Integer.valueOf(args[2]));
         } catch (SocketException e) {
             e.printStackTrace();
         }
 
         udpSenderClient = new UDPSenderClient(socketForClient);
-        udpReceiverClient = new UDPReceiverClient(socketForTargetAgent);
+        udpReceiverClient = new UDPReceiverClient(socketForClient);
 
         udpReceiverTargetAgent = new UDPReceiverTargetAgent(socketForTargetAgent);
         udpSenderTargetAgent = new UDPSenderTargetAgent(socketForTargetAgent);
@@ -99,10 +101,24 @@ public class Launcher {
             System.out.println("Invalid XML Equipment description - check CommunicationLink");
         }
 
+        Thread threadReceiverClient = new Thread(udpReceiverClient, "UDPReceiverClient");
+        Thread threadReceiverTargetAgent = new Thread(udpReceiverTargetAgent,"UDPReceiverTargetAgent");
+
+        threadReceiverClient.start();
+        threadReceiverTargetAgent.start();
+
 
     }
     public void initializeMessageHandler(){
         MessageHandler.setUdpSenderClient(udpSenderClient);
         MessageHandler.setUdpSenderTargetAgent(udpSenderTargetAgent);
+
+        MessageHandler.setTypeDebugSymbolSet(typeEquipmentDescription.getDebugSymbols().getDebugSymbolSet().get(0));
     }
+    public void startTargetAgentPresenceChecker(){
+        targetAgentPresenceChecker = new TargetAgentPresenceChecker(udpSenderTargetAgent);
+        Thread threadTargetAgentPresenceChecker = new Thread(targetAgentPresenceChecker,"TargetAgentPresenceChecker");
+        threadTargetAgentPresenceChecker.start();
+    }
+
 }

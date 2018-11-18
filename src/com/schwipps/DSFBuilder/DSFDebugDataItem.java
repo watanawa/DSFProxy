@@ -7,7 +7,8 @@ public class DSFDebugDataItem {
     /* Structure
     0   DataLength      1Byte uint
     1   DataItemAddress 4Byte uint
-    6   Data            1..Byte uint
+    (Optional)
+    5   Data            1..255 Byte uint
 
     */
 
@@ -15,6 +16,7 @@ public class DSFDebugDataItem {
     public DSFDebugDataItem(byte[] b){
         this.b = b;
     }
+    //Unused
     public DSFDebugDataItem(int dataLength, long dataItemAddress, byte[] data){
         if(data == null){
             this.b = new byte[5];
@@ -25,9 +27,13 @@ public class DSFDebugDataItem {
         setDataLength(dataLength);
         setDataItemAddress(dataItemAddress);
         setData(data);
-
     }
-
+    //Used for RequestDebugData
+    public DSFDebugDataItem(int dataLength, long dataItemAddress){
+        this.b = new byte[5];
+        setDataLength(dataLength);
+        setDataItemAddress(dataItemAddress);
+    }
     public byte[] getByte(){
         return b;
     }
@@ -36,18 +42,20 @@ public class DSFDebugDataItem {
         byte[] temp = {0x00, 0x00,0x00,b[0]};
         return ByteBuffer.allocate(4).wrap(temp).getInt();
     }
-
     public long getDataItemAdress(){
         byte[] temp = {0x00, 0x00,0x00,0x00,b[1],b[2],b[3],b[4]};
         return ByteBuffer.wrap(temp).getLong();
     }
-
     public byte[] getData(){
         if(b.length == 5) {
             return null;
         }
-        return Arrays.copyOfRange(b,5,b.length+1);
+        return Arrays.copyOfRange(b,5,b.length);
     }
+    public int getDataItemLength(){
+        return (5+getDataLength());
+    }
+
 
     public void setDataLength(int dataLength){
         b[0] = ByteBuffer.allocate(4).putInt(dataLength).array()[3];
@@ -60,11 +68,8 @@ public class DSFDebugDataItem {
         b[4] = temp[7];
     }
     public void setData(byte[] data){
-        if(data != null){
-            for(int i = 0; i < data.length; i++){
-                b[5+i] = data[i];
-            }
+        if(data != null && data.length < 256){
+            System.arraycopy(data, 0, b, 5, data.length);
         }
     }
-        //TODO
 }

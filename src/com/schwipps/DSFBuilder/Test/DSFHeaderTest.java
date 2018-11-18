@@ -19,6 +19,14 @@ class DSFHeaderTest {
         Assertions.assertEquals(4,head.getIDDVersion());
         Assertions.assertEquals(4,head.getChecksumSize());
 
+        head = new DSFHeader(head.getByte());
+        Assertions.assertEquals(1,head.getInstanceID());
+        Assertions.assertEquals(MessageType.TARGET_AGENT_DATA_MESSAGE,head.getMessageType());
+        Assertions.assertEquals(3,head.getMessageLength());
+        Assertions.assertEquals(true,head.getAckRequired());
+        Assertions.assertEquals(4,head.getIDDVersion());
+        Assertions.assertEquals(4,head.getChecksumSize());
+
         }
 
     @Test

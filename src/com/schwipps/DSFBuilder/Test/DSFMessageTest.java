@@ -4,81 +4,50 @@ import com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import org.junit.jupiter.api.Test;
-
+import static org.junit.jupiter.api.Assertions.*;
 class DSFMessageTest {
 
     @Test
-    void getByte() {
+    void check() {
+        //Header
+        int instanceID = 1;
+        MessageType messageType = MessageType.DEBUG_DATA_READ_REQUEST_MESSAGE;
+        int messageLength = 29;
+        boolean ackRequired = false;
+        int iddVersion = 2;
+        int checksumSize = 4;
+        //Body
+        long timeStamp = 2343;
+        int targetAgentId = 12;
+        byte[] data = new byte[16];
+        TargetAgentMode targetAgentMode = TargetAgentMode.CONNECTED;
+        int maxUtilization = 99;
+        int lostClientRequestMessages = 10;
+        int rxBufferSize = 1000;
+        int txBufferSize = 2000;
+        int maxSamplingFrequency = 50;
 
-        DSFHeader header    = new DSFHeader(1, MessageType.TARGET_AGENT_DATA_MESSAGE,29,true,10, 4);
-        DSFBody body        = new DSFBodyTargetAgentDataMessage(2000,12,new byte[16], TargetAgentMode.CONNECTED,99,10,1000,2000,50);
+
+
+        DSFHeader header    = new DSFHeader(instanceID, messageType,messageLength,ackRequired,iddVersion,checksumSize);
+        DSFBody body        = new DSFBodyTargetAgentDataMessage(timeStamp,targetAgentId,data,targetAgentMode,maxUtilization,lostClientRequestMessages,rxBufferSize,txBufferSize,maxSamplingFrequency);
         DSFFooter footer    = new DSFFooter(header.getChecksum()+body.getChecksum(),header.getChecksumSize());
 
         DSFMessage dsfMessage = new DSFMessage(header,body,footer);
+        dsfMessage = new DSFMessage(dsfMessage.getByte());
 
-        System.out.println(dsfMessage.getMessageType().toString());
-        if(dsfMessage.getBody() instanceof  DSFBodyTargetAgentDataMessage){
-            System.out.println( ((DSFBodyTargetAgentDataMessage)dsfMessage.getBody()).getMode().toString());
-            System.out.println(footer.getChecksumNumber());
-            System.out.println(dsfMessage.messageErrorFree());
-        }
+        assertEquals(instanceID,dsfMessage.getHead().getInstanceID() );
+        assertEquals(messageType,dsfMessage.getHead().getMessageType() );
+        assertEquals(messageLength,dsfMessage.getHead().getMessageLength() );
+        assertEquals(ackRequired, dsfMessage.getHead().getAckRequired());
+        assertEquals(iddVersion, dsfMessage.getHead().getIDDVersion());
+        assertEquals(checksumSize, dsfMessage.getHead().getChecksumSize());
+
+
+
     }
 
-    @Test
-    void testDSFMessageWithByteArgument() {
-        DSFHeader header = new DSFHeader(1, MessageType.TARGET_AGENT_DATA_MESSAGE, 29, true, 2, 4);
-        DSFBody body = new DSFBodyTargetAgentDataMessage(2000, 12, new byte[16], TargetAgentMode.CONNECTED, 99, 10, 1000, 2000, 50);
-        DSFFooter footer = new DSFFooter(header.getChecksum() + body.getChecksum(), header.getChecksumSize());
 
-        int length = header.getLength() + header.getMessageLength() + header.getChecksumSize();
-
-        byte[] b = new byte[header.getLength() + header.getMessageLength() + header.getChecksumSize()];
-        for (int i = 0; i < length; i++) {
-            if (i < header.getLength()) {
-                b[i] = header.getByte()[i];
-            } else if ((header.getLength() <= i) & (i < header.getLength() + header.getMessageLength())) {
-                b[i] = body.getByte()[i - header.getLength()];
-            } else if (i >= header.getLength() + header.getMessageLength()) {
-                b[i] = footer.getByte()[i - header.getLength() - header.getMessageLength()];
-            }
-        }
-        //Induced Error
-        // b[14] = 0x13;
-
-
-        DSFMessage dsfMessage = new DSFMessage(b);
-
-
-        if(dsfMessage.getMessageType().equals(MessageType.TARGET_AGENT_DATA_MESSAGE)){
-            DSFBodyTargetAgentDataMessage  targetAgentDataMessage = new DSFBodyTargetAgentDataMessage(dsfMessage.getBody().getByte());
-            DSFFooter myFooter = dsfMessage.getFooter();
-            DSFHeader head = new DSFHeader(dsfMessage.getHead().getByte());
-
-            System.out.println(head.getInstanceID());
-            System.out.println(head.getMessageType().toString());
-            System.out.println(head.getMessageLength());
-            System.out.println(head.getAckRequired());
-            System.out.println(head.getIDDVersion());
-            System.out.println(head.getChecksumSize());
-
-            System.out.println(targetAgentDataMessage.getTimeStamp());
-            System.out.println(targetAgentDataMessage.getTargetAgentId());
-            System.out.println(targetAgentDataMessage.getMode().toString());
-            System.out.println(targetAgentDataMessage.getMaxUtilization());
-            System.out.println(targetAgentDataMessage.getLostClientRequestMessages());
-            System.out.println(targetAgentDataMessage.getRXBufferSize());
-            System.out.println(targetAgentDataMessage.getTXBufferSize());
-            System.out.println(targetAgentDataMessage.getMaxSamplingFrequency());
-
-            System.out.println(footer.getChecksumNumber());
-            System.out.println(dsfMessage.messageErrorFree());
-
-        }
-    }
-
-    @Test
-    void setHead() {
-    }
 
     @Test
     void getBody() {
