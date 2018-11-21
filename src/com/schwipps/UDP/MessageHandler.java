@@ -3,9 +3,13 @@ import  com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import com.schwipps.DSFBuilder.enums.TargetAgentRequestCommand;
+import com.schwipps.Json.JSONDebugDataMessage;
 import com.schwipps.Main.DSFAddressLinker;
+import com.schwipps.Main.DSFTuple;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class MessageHandler {
 
@@ -76,12 +80,43 @@ public class MessageHandler {
 
 
     }
-
     public void handleDebugDataMessage(DSFMessage dsfMessage){
-        //TODO
+        DSFBodyDebugDataMessage debugDataMessage = new DSFBodyDebugDataMessage(dsfMessage.getBody().getByte());
+        ArrayList<Integer> receiverClientsPorts = dsfAddressLinker.getRegisteredPorts();
+        HashMap<Integer, JSONDebugDataMessage> hashMapPortJSONDebugDataMessage = assembleJsonDebugDataMessages(debugDataMessage, receiverClientsPorts);
+        //Send the messages
+        for(int port: receiverClientsPorts){
+            udpSenderClient.sendMessage(port, hashMapPortJSONDebugDataMessage.get(port).toByte());
+        }
     }
+
     public void handleMessageClient(byte message[], int offset, int length) {
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);
         //TODO
+    }
+
+    private HashMap<Integer, JSONDebugDataMessage> assembleJsonDebugDataMessages(DSFBodyDebugDataMessage debugDataMessage, ArrayList<Integer> receiverClientsPorts){
+        HashMap<Integer, JSONDebugDataMessage> hashMapPortMessage = new HashMap<>();
+        //Create an empty  JSONDebugDataMessage for each port;
+        for(int i : receiverClientsPorts){
+            hashMapPortMessage.put(i, new JSONDebugDataMessage());
+        }
+
+        for(DSFDebugDataItem dsfDebugDataItem : debugDataMessage.getDebugDataItems()){
+            //Get ports, which registered to receive that address
+            ArrayList<DSFTuple> tuples = dsfAddressLinker.getTuple(dsfDebugDataItem.getDataItemAddress());
+            //Add data to each JSON Message
+            // Problem: We have a port and an DataItem
+            for(DSFTuple tuple : tuples){
+                //Get the Json Message Corresponding to the port
+                JSONDebugDataMessage jsonDebugDataMessage = hashMapPortMessage.get(tuple.getPort());
+                jsonDebugDataMessage.addDataItem(dsfDebugDataItem, tuple.getDsfEquipmentDefinitionRecordElement());
+            }
+        }
+        return hashMapPortMessage;
+    }
+
+    public int getTargetAgentID() {
+        return targetAgentID;
     }
 }

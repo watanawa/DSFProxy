@@ -22,9 +22,9 @@ class DSFBodyDebugDataMessageTest {
         assertEquals(9999, dsfBodyDebugDataMessageObject.getTimeStamp() );
         assertEquals(42,dsfBodyDebugDataMessageObject.getTargetAgentId());
         //Test DebugDataItemsArray
-        assertEquals(item1.getDataItemAdress(), dsfBodyDebugDataMessageObject.getDebugDataItems()[0].getDataItemAdress());
-        assertEquals(item2.getDataItemAdress(), dsfBodyDebugDataMessageObject.getDebugDataItems()[1].getDataItemAdress());
-        assertEquals(item3.getDataItemAdress(), dsfBodyDebugDataMessageObject.getDebugDataItems()[2].getDataItemAdress());
+        assertEquals(item1.getDataItemAddressLong(), dsfBodyDebugDataMessageObject.getDebugDataItems()[0].getDataItemAddressLong());
+        assertEquals(item2.getDataItemAddressLong(), dsfBodyDebugDataMessageObject.getDebugDataItems()[1].getDataItemAddressLong());
+        assertEquals(item3.getDataItemAddressLong(), dsfBodyDebugDataMessageObject.getDebugDataItems()[2].getDataItemAddressLong());
 
         assertArrayEquals(item1.getData(),dsfBodyDebugDataMessageObject.getDebugDataItems()[0].getData());
         assertArrayEquals(item2.getData(),dsfBodyDebugDataMessageObject.getDebugDataItems()[1].getData());
@@ -35,9 +35,9 @@ class DSFBodyDebugDataMessageTest {
         assertEquals(9999, dsfBodyDebugDataMessage.getTimeStamp() );
         assertEquals(42,dsfBodyDebugDataMessage.getTargetAgentId());
         //Test DebugDataItemsArray
-        assertEquals(item1.getDataItemAdress(), dsfBodyDebugDataMessage.getDebugDataItems()[0].getDataItemAdress());
-        assertEquals(item2.getDataItemAdress(), dsfBodyDebugDataMessage.getDebugDataItems()[1].getDataItemAdress());
-        assertEquals(item3.getDataItemAdress(), dsfBodyDebugDataMessage.getDebugDataItems()[2].getDataItemAdress());
+        assertEquals(item1.getDataItemAddressLong(), dsfBodyDebugDataMessage.getDebugDataItems()[0].getDataItemAddressLong());
+        assertEquals(item2.getDataItemAddressLong(), dsfBodyDebugDataMessage.getDebugDataItems()[1].getDataItemAddressLong());
+        assertEquals(item3.getDataItemAddressLong(), dsfBodyDebugDataMessage.getDebugDataItems()[2].getDataItemAddressLong());
 
         assertArrayEquals(item1.getData(),dsfBodyDebugDataMessage.getDebugDataItems()[0].getData());
         assertArrayEquals(item2.getData(),dsfBodyDebugDataMessage.getDebugDataItems()[1].getData());

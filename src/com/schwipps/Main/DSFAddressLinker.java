@@ -1,6 +1,7 @@
 package com.schwipps.Main;
 
 import com.schwipps.DSFBuilder.DSFEquipmentDefinitionRecordElement;
+import com.schwipps.DSFBuilder.DSFRecordElement;
 import com.schwipps.DSFBuilder.enums.EquipmentDefinitionDataType;
 import com.schwipps.dsf.TypeCompilationUnit;
 import com.schwipps.dsf.TypeDebugSymbolSet;
@@ -8,78 +9,214 @@ import com.schwipps.dsf.TypeEquipmentDescription;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class DSFAddressLinker {
+    private class RecordTuple{
+        private TypeCompilationUnit.RecordDataType recordDataType;
+        private TypeCompilationUnit.RecordDataType.RecordElement recordElement;
+        private RecordTuple(TypeCompilationUnit.RecordDataType recordDataType, TypeCompilationUnit.RecordDataType.RecordElement recordElement){
+            setRecordDataType(recordDataType);
+            setRecordElement(recordElement);
+        }
+
+        public TypeCompilationUnit.RecordDataType getRecordDataType() {
+            return recordDataType;
+        }
+
+        public void setRecordDataType(TypeCompilationUnit.RecordDataType recordDataType) {
+            this.recordDataType = recordDataType;
+        }
+
+        public TypeCompilationUnit.RecordDataType.RecordElement getRecordElement() {
+            return recordElement;
+        }
+
+        public void setRecordElement(TypeCompilationUnit.RecordDataType.RecordElement recordElement) {
+            this.recordElement = recordElement;
+        }
+    }
 
     //This class keeps track, which Client registered for which dataitem
 
     //Address as long is used as key for minimal delay
-    private HashMap<Long, ArrayList<DSFTuple>> hashMapAddressToPort;
-
-
-    private TypeDebugSymbolSet typeDebugSymbolSet;
+    private HashMap<Long, ArrayList<DSFTuple>>  hashMapAddressToPort;
+    private ArrayList<Integer>                  registeredPorts;
+    private TypeDebugSymbolSet                  typeDebugSymbolSet;
 
     public  DSFAddressLinker (TypeEquipmentDescription typeEquipmentDescription){
         this.typeDebugSymbolSet = typeEquipmentDescription.getDebugSymbols().getDebugSymbolSet().get(0);
         hashMapAddressToPort = new HashMap<>();
+        registeredPorts = new ArrayList<>();
+    }
+    public ArrayList<Integer> getRegisteredPorts(){
+        return registeredPorts;
+    }
+    public void registerMessage(int portClient, DSFRecordElement dsfRecordElement ){
+        DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(dsfRecordElement);
+        byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
+        long addressVal = byteToLong(address);
+
+        //Address already exists
+        if(hashMapAddressToPort.containsKey(addressVal) ){
+            //check if already registered
+            boolean existing = false;
+            for(DSFTuple dsfTuple : hashMapAddressToPort.get(addressVal)){
+                if(dsfTuple.getPort() == portClient){
+                    existing = true;
+                    if(!registeredPorts.contains(new Integer(portClient))){
+                        registeredPorts.add(portClient);
+                    }
+                    return;
+                }
+            }
+            //add entry to arraylist
+            if(!existing){
+                hashMapAddressToPort.get(addressVal).add(new DSFTuple(portClient, dsfEquipmentDefinitionRecordElement));
+                if(!registeredPorts.contains(new Integer(portClient))){
+                    registeredPorts.add(portClient);
+                }
+            }
+        }
+        //First address
+        else{
+            ArrayList<DSFTuple> dsfTuple = new ArrayList<DSFTuple>();
+            dsfTuple.add(new DSFTuple(portClient, dsfEquipmentDefinitionRecordElement));
+            hashMapAddressToPort.put(addressVal,dsfTuple);
+            if(!registeredPorts.contains(new Integer(portClient))){
+                registeredPorts.add(portClient);
+            }
+        }
+    }
+    public void unregisterMessage(int portClient, DSFRecordElement dsfRecordElement){
+        DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(dsfRecordElement);
+        byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
+        Long addressVal = byteToLong(address);
+        ArrayList<DSFTuple> dsfTuples;
+        //Delete the corresponding dsfTuple
+        if(hashMapAddressToPort.containsKey(addressVal)){
+            dsfTuples = hashMapAddressToPort.get(addressVal);
+            for(int i = 0; i<  dsfTuples.size(); i++ ){
+                if(dsfTuples.get(i).getPort() == portClient){
+                    dsfTuples.remove(i);
+                }
+            }
+            // Clear key if only one was present
+            if (dsfTuples.size() == 0){
+                hashMapAddressToPort.remove(addressVal);
+            }
+        }
+
+        //remove from portList if necessary
+        if(!portRegistered(portClient)){
+            registeredPorts.remove(new Integer(portClient));
+        }
     }
 
+    public ArrayList<DSFTuple> getTuple (byte[] address){
+        return hashMapAddressToPort.get(byteToLong(address));
+    }
     // Um in die Hashmap zu schreiben
-    public DSFEquipmentDefinitionRecordElement getDSFEquipmentDefinitionRecordElement(String variableName, String recordElementName){
+    public DSFEquipmentDefinitionRecordElement getDSFEquipmentDefinitionRecordElement(DSFRecordElement dsfRecordElement){
+        //BUILDS a DSFEquipmentDefinitionRecordElement
+        //TODO build the DSFequipment instance
+        //String compilationUnitName  = dsfRecordElement.;
+        String variableName         = dsfRecordElement.getVariable();
+        LinkedList<String> recordElementNames = dsfRecordElement.getRecordElementNames();
+
+
         byte[] address = null;
-        BigInteger offset = null;
-        BigInteger size = null;
-        String datatypeId = null;
+        Object datatype = null;
+        int offset = 0;
+        int size = 0;
         DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = null;
         List<Object> scope = null;
+        TypeCompilationUnit compilationUnitArgument = null;
+        String variableDataTypeId = "";
 
+        //Fix the starting addres from the variable
         for(TypeCompilationUnit compilationUnit : typeDebugSymbolSet.getCompilationUnit()) {
-            List<Object> variableAndDatatype = compilationUnit.getVariableAndCharacterDataTypeAndBooleanDataType();
-            //we need to find the variable first because the record Element name is ambitious
-            for (Object variableAndDataTypeItem : variableAndDatatype) {
-                if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.VARIABLE)) {
-                    TypeCompilationUnit.Variable variable = (TypeCompilationUnit.Variable) variableAndDataTypeItem;
-                    //Variable found - needed to fix start pointer
-                    if (variable.getName().equalsIgnoreCase(variableName)) {
-                        address = variable.getAddress();
-                        scope = variableAndDatatype;
+
+                List<Object> variableAndDatatype = compilationUnit.getVariableAndCharacterDataTypeAndBooleanDataType();
+                for (Object variableAndDataTypeItem : variableAndDatatype) {
+                    if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.VARIABLE)) {
+                        TypeCompilationUnit.Variable variable = (TypeCompilationUnit.Variable) variableAndDataTypeItem;
+                        if (variable.getName().equals(variableName)) {
+                            address = variable.getAddress();
+                            scope = variableAndDatatype;
+                            compilationUnitArgument = compilationUnit;
+                            variableDataTypeId = variable.getDataTypeId();
+                        }
+                    }
+                }
+        }
+        //If only variable name given
+        if(dsfRecordElement.getRecordElementNames().size() == 0){
+            for(Object variableAndDataTypeItem : scope){
+                if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)){
+                    TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
+                    if(recordDataType.getId().equals(variableDataTypeId)){
+                        for (TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()){
+                            size += recordElement.getBitSize().intValue();
+                        }
+                        datatype = recordDataType;
                     }
                 }
             }
         }
-        for(Object variableAndDataTypeItem : scope) {
-            if(getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)){
-                //Bruteforce cast
-                TypeCompilationUnit.RecordDataType recordDataTypes = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
-                for( TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataTypes.getRecordElement()){
-                    //Record Element found
-                    if(recordElement.getName().equalsIgnoreCase(recordElementName)){
-                        offset = recordElement.getBitOffset();
-                        size = recordElement.getBitSize();
-                        datatypeId = recordElement.getDataTypeId();
+        else {
+            for (int i = 0; i < recordElementNames.size(); i++) {
+                for (Object variableAndDataTypeItem : scope) {
+                    if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)) {
+                        TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
+                        if (recordDataType.getId().equals(variableDataTypeId)) {
+                            for (TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()) {
+                                if(recordElement.getName().equalsIgnoreCase(recordElementNames.get(i))){
+                                    offset += recordElement.getBitOffset().intValue();
+                                    variableDataTypeId = recordElement.getDataTypeId();
+                                    //Arrived at destination
+                                    if(i == (recordElementNames.size()-1)){
+                                        size = recordElement.getBitSize().intValue();
+                                        datatype = getEquipmentDefinitionDataType(scope, recordElement.getDataTypeId());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
 
         //Assemble the information
-            if(address!= null && offset!= null){
+            if(address!= null ){
                 //Add offset to address and convert to byte again
                 byte[] temp = new byte[8];
                 System.arraycopy(address, 0, temp, 8-address.length, address.length);
                 long addressLong = ByteBuffer.wrap(temp).getLong();
-                addressLong += offset.longValue();
+                addressLong += offset;
                 byte[] addressByte = Arrays.copyOfRange(ByteBuffer.allocate(Long.BYTES).putLong(addressLong).array(), 4, 8);
 
-                Object datatypeItem = getEquipmentDefinitionDataType(scope,datatypeId);
-
-            dsfEquipmentDefinitionRecordElement = new DSFEquipmentDefinitionRecordElement(addressByte, datatypeItem,getDataType(datatypeItem), size.intValue() );
+            dsfEquipmentDefinitionRecordElement = new DSFEquipmentDefinitionRecordElement(addressByte, datatype,getDataType(datatype), size,compilationUnitArgument, dsfRecordElement );
         }
         return dsfEquipmentDefinitionRecordElement;
+    }
+
+    private RecordTuple getParentRecordTuple(RecordTuple recordTuple, List<Object> scope) {
+        for (Object variableAndDataTypeItem : scope) {
+            //Only RecordDataTypes are interesting
+            if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)) {
+                TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
+                for(TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()){
+                    //found it
+                    if(recordElement.getDataTypeId().equals(recordTuple.getRecordDataType().getId())){
+                        return new RecordTuple(recordDataType, recordElement);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private Object getEquipmentDefinitionDataType(List<Object> scope , String datatypeId){
@@ -180,53 +317,17 @@ public class DSFAddressLinker {
         }
     }
 
-    public void registerMessage(int portClient, String variableName, String recordElementName ){
-        DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(variableName, recordElementName);
-        byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
-        long addressVal = byteToLong(address);
 
-        if(hashMapAddressToPort.containsKey(addressVal) ){
-            //check if already registered
-            boolean existing = false;
-            for(DSFTuple dsfTuple : hashMapAddressToPort.get(addressVal)){
-                if(dsfTuple.getPort() == portClient){
-                    existing = true;
-                    return;
+    private boolean portRegistered(int port){
+        Iterator it = hashMapAddressToPort.entrySet().iterator();
+        while (it.hasNext()){
+            for (DSFTuple dsfTuple : (ArrayList<DSFTuple>)((Map.Entry)it.next()).getValue()){
+                if(dsfTuple.getPort() == port){
+                    return true;
                 }
             }
-            //add entry to arraylist
-            if(!existing){
-                hashMapAddressToPort.get(addressVal).add(new DSFTuple(portClient, dsfEquipmentDefinitionRecordElement));
-            }
         }
-        else{
-            ArrayList<DSFTuple> dsfTuple = new ArrayList<DSFTuple>();
-            dsfTuple.add(new DSFTuple(portClient, dsfEquipmentDefinitionRecordElement));
-            hashMapAddressToPort.put(addressVal,dsfTuple);
-        }
-    }
-    public void unregisterMessage(int portClient, String variableName, String recordElementName){
-        DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(variableName, recordElementName);
-        byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
-        Long addressVal = byteToLong(address);
-        ArrayList<DSFTuple> dsfTuples;
-        //Delete the corresponding dsfTuple
-        if(hashMapAddressToPort.containsKey(addressVal)){
-            dsfTuples = hashMapAddressToPort.get(addressVal);
-            for(int i = 0; i<  dsfTuples.size(); i++ ){
-                if(dsfTuples.get(i).getPort() == portClient){
-                    dsfTuples.remove(i);
-                }
-            }
-            // Clear key if only one was present
-            if (dsfTuples.size() == 0){
-                hashMapAddressToPort.remove(addressVal);
-            }
-        }
-    }
-
-    public ArrayList<DSFTuple> getTuple (byte[] address){
-        return hashMapAddressToPort.get(byteToLong(address));
+        return false;
     }
 
     private long byteToLong(byte[] b){
@@ -237,4 +338,5 @@ public class DSFAddressLinker {
     private byte[] LongToByte(long n, int size){
         return Arrays.copyOfRange(ByteBuffer.allocate(8).putLong(n).array(), 8-size, 8);
     }
+
 }

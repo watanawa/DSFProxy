@@ -1,4 +1,7 @@
 package com.schwipps.Main;
+import com.schwipps.DSFBuilder.Builder;
+import com.schwipps.DSFBuilder.DSFDebugDataItem;
+import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
 import com.schwipps.UDP.*;
 import com.schwipps.dsf.TypeEquipmentDescription;
 import com.schwipps.dsf.TypeEthernetLink;
@@ -23,12 +26,13 @@ public class Launcher {
     DatagramSocket socketForClient;
 
     UDPReceiverTargetAgent udpReceiverTargetAgent;
-    UDPSenderTargetAgent udpSenderTargetAgent;
+    //TODO
+    public UDPSenderTargetAgent udpSenderTargetAgent;
     UDPReceiverClient udpReceiverClient;
     UDPSenderClient udpSenderClient;
 
-    MessageHandler messageHandler;
-    DSFAddressLinker dsfAddressLinker;
+    public MessageHandler messageHandler;
+    public DSFAddressLinker dsfAddressLinker;
 
     TargetAgentPresenceChecker targetAgentPresenceChecker;
 
@@ -39,6 +43,7 @@ public class Launcher {
     //STARTUP [0] EquipmentdescriptionFile [1] Port of TargetAgentSocket [2] Port of ClientSocket
     public static void main(String[] args) {
         System.out.println("Launching DSF Proxy");
+
         Launcher launcher = new Launcher(args);
         launcher.setEquipmentDescriptionFile();
         launcher.unmarshall();
@@ -47,16 +52,13 @@ public class Launcher {
         launcher.createUDPSender();
         launcher.createMessageHandler();
         launcher.createUDPReceiver();
-
-
         launcher.createTargetAgentPresenceChecker();
 
         System.out.println("DSF Proxy succesfully started");
-
     }
 
 
-    private void createDSFAddressLinker() {
+    public void createDSFAddressLinker() {
         dsfAddressLinker = new DSFAddressLinker(typeEquipmentDescription);
     }
 

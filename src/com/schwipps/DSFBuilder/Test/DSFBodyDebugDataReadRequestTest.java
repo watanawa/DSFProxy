@@ -22,9 +22,9 @@ class DSFBodyDebugDataReadRequestTest {
         assertEquals (200, dsfBodyDebugDataReadRequest.getTargetAgentId());
         assertEquals(DebugDataReadRequestCommand.READ_DATA_PERIODICALLY, dsfBodyDebugDataReadRequest.getDebugDataReadRequestCommand());
         //now check array
-        assertEquals(item0.getDataItemAdress(),dsfBodyDebugDataReadRequest.getDebugDataItems()[0].getDataItemAdress() );
-        assertEquals(item1.getDataItemAdress(),dsfBodyDebugDataReadRequest.getDebugDataItems()[1].getDataItemAdress() );
-        assertEquals(item2.getDataItemAdress(),dsfBodyDebugDataReadRequest.getDebugDataItems()[2].getDataItemAdress() );
+        assertEquals(item0.getDataItemAddressLong(),dsfBodyDebugDataReadRequest.getDebugDataItems()[0].getDataItemAddressLong() );
+        assertEquals(item1.getDataItemAddressLong(),dsfBodyDebugDataReadRequest.getDebugDataItems()[1].getDataItemAddressLong() );
+        assertEquals(item2.getDataItemAddressLong(),dsfBodyDebugDataReadRequest.getDebugDataItems()[2].getDataItemAddressLong() );
 
         //Check byte contructor
         DSFBodyDebugDataReadRequest dsfBodyDebugDataReadRequestByte = new DSFBodyDebugDataReadRequest(dsfBodyDebugDataReadRequest.getByte());
@@ -32,9 +32,9 @@ class DSFBodyDebugDataReadRequestTest {
         assertEquals (200, dsfBodyDebugDataReadRequestByte.getTargetAgentId());
         assertEquals(DebugDataReadRequestCommand.READ_DATA_PERIODICALLY, dsfBodyDebugDataReadRequestByte.getDebugDataReadRequestCommand());
         //now check array
-        assertEquals(item0.getDataItemAdress(),dsfBodyDebugDataReadRequestByte.getDebugDataItems()[0].getDataItemAdress() );
-        assertEquals(item1.getDataItemAdress(),dsfBodyDebugDataReadRequestByte.getDebugDataItems()[1].getDataItemAdress() );
-        assertEquals(item2.getDataItemAdress(),dsfBodyDebugDataReadRequestByte.getDebugDataItems()[2].getDataItemAdress() );
+        assertEquals(item0.getDataItemAddressLong(),dsfBodyDebugDataReadRequestByte.getDebugDataItems()[0].getDataItemAddressLong() );
+        assertEquals(item1.getDataItemAddressLong(),dsfBodyDebugDataReadRequestByte.getDebugDataItems()[1].getDataItemAddressLong() );
+        assertEquals(item2.getDataItemAddressLong(),dsfBodyDebugDataReadRequestByte.getDebugDataItems()[2].getDataItemAddressLong() );
     }
 
 }

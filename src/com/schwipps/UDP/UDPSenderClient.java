@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class UDPSenderClient {
     DatagramSocket socket;
@@ -11,12 +12,20 @@ public class UDPSenderClient {
         this.socket = socket;
     }
 
-    public void sendMessage(InetAddress inetAddress, int port, byte[] message){
-        DatagramPacket datagramPacket = new DatagramPacket(message,message.length,inetAddress,port);
+    public void sendMessage(int port, byte[] message){
+        InetAddress inetAddress = null;
         try {
-            socket.send(datagramPacket);
-        } catch (IOException e) {
+            inetAddress = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
             e.printStackTrace();
+        }
+        if(inetAddress!= null){
+            DatagramPacket datagramPacket = new DatagramPacket(message,message.length,inetAddress,port);
+            try {
+                socket.send(datagramPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

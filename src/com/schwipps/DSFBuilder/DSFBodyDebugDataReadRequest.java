@@ -43,7 +43,7 @@ public class DSFBodyDebugDataReadRequest extends DSFBody{
         for(int i = 0; i < debugDataItems.length; i++){
             if(debugDataItems[i] != null){
                     b[2 + 5 * i] = intToByte(debugDataItems[i].getDataLength())[3];
-                    System.arraycopy(longToByte(debugDataItems[i].getDataItemAdress()), 4, b, 3 + 5 * i, 4);
+                    System.arraycopy(debugDataItems[i].getDataItemAddress(), 0, b, 3 + 5 * i, 4);
 
             }
         }

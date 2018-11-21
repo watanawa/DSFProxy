@@ -1,21 +1,29 @@
 package com.schwipps.DSFBuilder;
 
 import com.schwipps.DSFBuilder.enums.EquipmentDefinitionDataType;
+import com.schwipps.dsf.TypeCompilationUnit;
 
+import java.awt.*;
 import java.math.BigInteger;
+import java.util.LinkedList;
 
 public class DSFEquipmentDefinitionRecordElement {
     private byte[] address;
     private Object dataTypeItem;
     private EquipmentDefinitionDataType dataTypeEnum;
     private int bitSize;
+    private TypeCompilationUnit compilationUnit;
 
+    private DSFRecordElement dsfRecordElement;
 
-    public DSFEquipmentDefinitionRecordElement(byte[] address, Object dataTypeItem, EquipmentDefinitionDataType dataTypeEnum, int bitSize){
+    public DSFEquipmentDefinitionRecordElement(byte[] address, Object dataTypeItem, EquipmentDefinitionDataType dataTypeEnum, int bitSize, TypeCompilationUnit compilationUnit ,DSFRecordElement dsfRecordElement){
         setAddress(address);
         setDataTypeItem(dataTypeItem);
         setDataTypeEnum(dataTypeEnum);
         setBitSize(bitSize);
+
+        setCompilationUnit(compilationUnit);
+        setDsfRecordElement(dsfRecordElement);
     }
 
     public byte[] getAddress() {
@@ -48,5 +56,28 @@ public class DSFEquipmentDefinitionRecordElement {
 
     public void setBitSize(int bitSize) {
         this.bitSize = bitSize;
+    }
+
+    public DSFDebugDataItem getDSFDebugDataItem(){
+        return new DSFDebugDataItem(bitSize/8, address);
+    }
+
+
+
+    public TypeCompilationUnit getCompilationUnit() {
+        return compilationUnit;
+    }
+
+    public void setCompilationUnit(TypeCompilationUnit compilationUnit) {
+        this.compilationUnit = compilationUnit;
+    }
+
+
+    public DSFRecordElement getDsfRecordElement() {
+        return dsfRecordElement;
+    }
+
+    public void setDsfRecordElement(DSFRecordElement dsfRecordElement) {
+        this.dsfRecordElement = dsfRecordElement;
     }
 }
