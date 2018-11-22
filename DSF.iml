@@ -19,6 +19,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="JSONP" level="project" />
+    <orderEntry type="library" name="JSONOrg" level="project" />
   </component>
 </module>

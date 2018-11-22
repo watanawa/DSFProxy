@@ -61,12 +61,14 @@ public class DSFAddressLinker {
         if(hashMapAddressToPort.containsKey(addressVal) ){
             //check if already registered
             boolean existing = false;
+            //Address is already existing as key
             for(DSFTuple dsfTuple : hashMapAddressToPort.get(addressVal)){
+                //check if the port already registered to that address
                 if(dsfTuple.getPort() == portClient){
-                    existing = true;
-                    if(!registeredPorts.contains(new Integer(portClient))){
-                        registeredPorts.add(portClient);
-                    }
+                    //DO NOTHING
+                    //existing = true;
+                    //if(!registeredPorts.contains(new Integer(portClient))){
+                    //registeredPorts.add(portClient);
                     return;
                 }
             }
@@ -78,7 +80,7 @@ public class DSFAddressLinker {
                 }
             }
         }
-        //First address
+        //Address is not existing yet
         else{
             ArrayList<DSFTuple> dsfTuple = new ArrayList<DSFTuple>();
             dsfTuple.add(new DSFTuple(portClient, dsfEquipmentDefinitionRecordElement));
@@ -203,28 +205,13 @@ public class DSFAddressLinker {
         return dsfEquipmentDefinitionRecordElement;
     }
 
-    private RecordTuple getParentRecordTuple(RecordTuple recordTuple, List<Object> scope) {
-        for (Object variableAndDataTypeItem : scope) {
-            //Only RecordDataTypes are interesting
-            if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)) {
-                TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
-                for(TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()){
-                    //found it
-                    if(recordElement.getDataTypeId().equals(recordTuple.getRecordDataType().getId())){
-                        return new RecordTuple(recordDataType, recordElement);
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     private Object getEquipmentDefinitionDataType(List<Object> scope , String datatypeId){
         Object dataType = null;
         for (Object obj : scope){
             switch (getDataType(obj)){
                 case VARIABLE:
-                    if( ((TypeCompilationUnit.Variable)obj).getName().equalsIgnoreCase(datatypeId)){
+                    if( ((TypeCompilationUnit.Variable)obj).getDataTypeId().equalsIgnoreCase(datatypeId)){
                             return obj;
                     }
                     break;

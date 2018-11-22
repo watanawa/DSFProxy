@@ -110,7 +110,7 @@ public class MessageHandler {
             for(DSFTuple tuple : tuples){
                 //Get the Json Message Corresponding to the port
                 JSONDebugDataMessage jsonDebugDataMessage = hashMapPortMessage.get(tuple.getPort());
-                jsonDebugDataMessage.addDataItem(dsfDebugDataItem, tuple.getDsfEquipmentDefinitionRecordElement());
+                jsonDebugDataMessage.addField(dsfDebugDataItem, tuple.getDsfEquipmentDefinitionRecordElement());
             }
         }
         return hashMapPortMessage;

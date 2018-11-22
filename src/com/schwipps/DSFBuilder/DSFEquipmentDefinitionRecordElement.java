@@ -5,6 +5,7 @@ import com.schwipps.dsf.TypeCompilationUnit;
 
 import java.awt.*;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 public class DSFEquipmentDefinitionRecordElement {
@@ -28,6 +29,12 @@ public class DSFEquipmentDefinitionRecordElement {
 
     public byte[] getAddress() {
         return address;
+    }
+
+    public long getAddressLong(){
+        byte[] temp = new byte[Long.BYTES];
+        System.arraycopy(address, 0, temp, Long.BYTES-address.length,address.length );
+       return ByteBuffer.wrap(temp).getLong();
     }
 
     public void setAddress(byte[] address) {
