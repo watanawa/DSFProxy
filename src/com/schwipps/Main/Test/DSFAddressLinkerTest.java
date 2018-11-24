@@ -6,7 +6,6 @@ import com.schwipps.Main.Unmarshaller;
 import com.schwipps.dsf.TypeEquipmentDescription;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.File;
 import java.util.LinkedList;
 
@@ -24,13 +23,10 @@ class DSFAddressLinkerTest {
 
         DSFRecordElement dsfRecordElement = new DSFRecordElement(variableName,datarecordElement);
 
-        HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
-        byte[] b = hexBinaryAdapter.unmarshal("080494B0");
 
         dsfAddressLinker.registerMessage(2000, dsfRecordElement);
 
 
-        dsfAddressLinker.unregisterMessage(2000, dsfRecordElement);
 
 
     }

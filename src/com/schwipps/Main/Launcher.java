@@ -1,16 +1,19 @@
 package com.schwipps.Main;
 import com.schwipps.DSFBuilder.Builder;
 import com.schwipps.DSFBuilder.DSFDebugDataItem;
+import com.schwipps.DSFBuilder.DSFRecordElement;
 import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
 import com.schwipps.UDP.*;
 import com.schwipps.dsf.TypeEquipmentDescription;
 import com.schwipps.dsf.TypeEthernetLink;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
 
 // Company: Airbus Defence and Space
 // Author:  Christoph Schwipps
@@ -19,17 +22,17 @@ import java.net.UnknownHostException;
 public class Launcher {
     String args[];
 
-    private String equipmentDescriptionFile;
-    TypeEquipmentDescription typeEquipmentDescription;
+    public String equipmentDescriptionFile;
+    public TypeEquipmentDescription typeEquipmentDescription;
 
-    DatagramSocket socketForTargetAgent;
-    DatagramSocket socketForClient;
+    public DatagramSocket socketForTargetAgent;
+    public DatagramSocket socketForClient;
 
-    UDPReceiverTargetAgent udpReceiverTargetAgent;
-    //TODO
+    public UDPReceiverTargetAgent udpReceiverTargetAgent;
+
     public UDPSenderTargetAgent udpSenderTargetAgent;
-    UDPReceiverClient udpReceiverClient;
-    UDPSenderClient udpSenderClient;
+    public UDPReceiverClient udpReceiverClient;
+    public UDPSenderClient udpSenderClient;
 
     public MessageHandler messageHandler;
     public DSFAddressLinker dsfAddressLinker;
@@ -55,20 +58,20 @@ public class Launcher {
         launcher.createTargetAgentPresenceChecker();
 
         System.out.println("DSF Proxy succesfully started");
-    }
 
+        launcher.test();
+
+    }
 
     public void createDSFAddressLinker() {
         dsfAddressLinker = new DSFAddressLinker(typeEquipmentDescription);
     }
-
     public String getEquipmentDescriptionFile(){
         return equipmentDescriptionFile;
     }
     public TypeEquipmentDescription getTypeEquipmentDescription(){
         return typeEquipmentDescription;
     }
-
     public void setEquipmentDescriptionFile(){
         equipmentDescriptionFile = args[0];
     }
@@ -88,7 +91,6 @@ public class Launcher {
             e.printStackTrace();
         }
     }
-
     public void createUDPSender(){
 
         udpSenderClient = new UDPSenderClient(socketForClient);
@@ -124,7 +126,6 @@ public class Launcher {
         threadReceiverClient.start();
         threadReceiverTargetAgent.start();
     }
-
     public void createMessageHandler(){
         messageHandler = new MessageHandler();
         messageHandler.setUdpSenderClient(udpSenderClient);
@@ -135,6 +136,41 @@ public class Launcher {
         targetAgentPresenceChecker = new TargetAgentPresenceChecker(udpSenderTargetAgent);
         Thread threadTargetAgentPresenceChecker = new Thread(targetAgentPresenceChecker,"TargetAgentPresenceChecker");
         threadTargetAgentPresenceChecker.start();
+    }
+
+    public void test(){
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        DSFDebugDataItem[] dataItems = new DSFDebugDataItem[3];
+
+        String variableName = "NAV_BasicConsolidation_Context";
+        LinkedList<String> datarecordElementAccX = new LinkedList<>();
+        datarecordElementAccX.add("AccelerationX");
+        LinkedList<String> datarecordElementAccY = new LinkedList<>();
+        datarecordElementAccY.add("AccelerationY");
+        LinkedList<String> datarecordElementAccZ = new LinkedList<>();
+        datarecordElementAccZ.add("AccelerationZ");
+
+        DSFRecordElement dsfRecordElementX = new DSFRecordElement(variableName,datarecordElementAccX);
+        DSFRecordElement dsfRecordElementY = new DSFRecordElement(variableName,datarecordElementAccY);
+        DSFRecordElement dsfRecordElementZ = new DSFRecordElement(variableName,datarecordElementAccZ);
+
+        dataItems[0] = this.dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementX).getDSFDebugDataItem();
+        dataItems[1] = this.dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementY).getDSFDebugDataItem();
+        dataItems[2] = this.dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementZ).getDSFDebugDataItem();
+        //dataItems[1] = launcher.dsfAddressLinker.getDSFEquipmentDefinitionRecordElement("NAV_BasicConsolidation_Input", "InertialRollRate").getDSFDebugDataItem();
+        System.out.println("Sending request");
+
+        this.dsfAddressLinker.registerMessage(2000, dsfRecordElementX);
+        this.dsfAddressLinker.registerMessage(2000, dsfRecordElementY);
+        this.dsfAddressLinker.registerMessage(2000, dsfRecordElementZ);
+
+        this.udpSenderTargetAgent.sendMessage(Builder.buildDebugDataReadRequest(this.messageHandler.getTargetAgentID(), DebugDataReadRequestCommand.READ_DATA_PERIODICALLY, dataItems).getByte());
+
     }
 
 }

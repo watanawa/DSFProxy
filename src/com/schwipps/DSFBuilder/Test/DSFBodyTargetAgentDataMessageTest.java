@@ -2,9 +2,9 @@ package com.schwipps.DSFBuilder.Test;
 
 import com.schwipps.DSFBuilder.DSFBodyTargetAgentDataMessage;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DSFBodyTargetAgentDataMessageTest {
     @Test

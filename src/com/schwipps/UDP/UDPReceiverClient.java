@@ -3,7 +3,6 @@ package com.schwipps.UDP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.Arrays;
 
 public class UDPReceiverClient implements Runnable {
     private DatagramSocket socket;

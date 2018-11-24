@@ -1,5 +1,6 @@
 package com.schwipps.UDP;
-import  com.schwipps.DSFBuilder.*;
+
+import com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import com.schwipps.DSFBuilder.enums.TargetAgentRequestCommand;
@@ -7,6 +8,7 @@ import com.schwipps.Json.JSONDebugDataMessage;
 import com.schwipps.Main.DSFAddressLinker;
 import com.schwipps.Main.DSFTuple;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +22,16 @@ public class MessageHandler {
     private  UDPSenderClient udpSenderClient;
     private  DSFAddressLinker dsfAddressLinker;
 
+    FileWriter out;
+    public MessageHandler(){
+        try {
+            out = new FileWriter(new File("filename.txt"), true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void setUdpSenderTargetAgent(UDPSenderTargetAgent udpSenderTargetAgentArgument){
         udpSenderTargetAgent = udpSenderTargetAgentArgument;
@@ -87,6 +99,13 @@ public class MessageHandler {
         //Send the messages
         for(int port: receiverClientsPorts){
             udpSenderClient.sendMessage(port, hashMapPortJSONDebugDataMessage.get(port).toByte());
+            //TODO TESTWISE
+            try {
+                out.write(hashMapPortJSONDebugDataMessage.get(port).getJsonDebugDataObject().toString());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -118,5 +137,9 @@ public class MessageHandler {
 
     public int getTargetAgentID() {
         return targetAgentID;
+    }
+
+    public boolean isConnectedToTargetAgent() {
+        return connectedToTargetAgent;
     }
 }

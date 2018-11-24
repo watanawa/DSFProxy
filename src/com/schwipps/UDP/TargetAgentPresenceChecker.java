@@ -16,7 +16,7 @@ public class TargetAgentPresenceChecker implements Runnable {
         while(running){
             udpSenderTargetAgent.sendMessage(Builder.buildTargetAgentRequestMessage(0, 0, TargetAgentRequestCommand.PRESENCE_CHECK).getByte());
             try {
-                Thread.sleep(5000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

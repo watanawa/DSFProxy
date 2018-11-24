@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="JSONOrg">
+  <library name="JSON">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/json-20180813.jar!/" />
     </CLASSES>

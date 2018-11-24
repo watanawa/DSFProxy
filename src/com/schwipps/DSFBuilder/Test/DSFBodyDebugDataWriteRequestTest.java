@@ -1,11 +1,11 @@
 package com.schwipps.DSFBuilder.Test;
 
-import com.schwipps.DSFBuilder.DSFBodyDebugDataMessage;
 import com.schwipps.DSFBuilder.DSFBodyDebugDataWriteRequest;
 import com.schwipps.DSFBuilder.DSFDebugDataItem;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DSFBodyDebugDataWriteRequestTest {
 

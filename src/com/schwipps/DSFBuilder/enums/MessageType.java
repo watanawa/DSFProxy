@@ -1,10 +1,5 @@
 package com.schwipps.DSFBuilder.enums;
 
-import sun.plugin2.message.Message;
-
-import java.util.HashMap;
-import java.util.Map;
-
 public enum MessageType {
     TARGET_AGENT_REQUEST_MESSAGE(10000),
     TARGET_AGENT_DATA_MESSAGE(10001),

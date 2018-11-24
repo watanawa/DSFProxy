@@ -4,7 +4,8 @@ import com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import com.schwipps.DSFBuilder.enums.TargetAgentMode;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 class DSFMessageTest {
 
     @Test

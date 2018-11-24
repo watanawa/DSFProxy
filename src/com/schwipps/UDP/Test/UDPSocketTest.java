@@ -1,12 +1,11 @@
 package com.schwipps.UDP.Test;
 
-import com.schwipps.DSFBuilder.DSFMessage;
+import com.schwipps.DSFBuilder.*;
 import com.schwipps.DSFBuilder.enums.MessageType;
 import com.schwipps.DSFBuilder.enums.TargetAgentRequestCommand;
 import com.schwipps.UDP.UDPReceiverTargetAgent;
 import com.schwipps.UDP.UDPSenderTargetAgent;
 import org.junit.jupiter.api.Test;
-import com.schwipps.DSFBuilder.*;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;

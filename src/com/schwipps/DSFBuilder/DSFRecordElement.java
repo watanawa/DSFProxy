@@ -1,7 +1,5 @@
 package com.schwipps.DSFBuilder;
 
-import sun.awt.image.ImageWatched;
-
 import java.util.LinkedList;
 
 public class DSFRecordElement {

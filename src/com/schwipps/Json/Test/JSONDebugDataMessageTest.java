@@ -21,12 +21,12 @@ class JSONDebugDataMessageTest {
         Random random = new Random();
         byte[] b = new byte[96];
         random.nextBytes(b);
-        byte[] a = new byte[104];
+        byte[] a = new byte[8];
         random.nextBytes(a);
 
 
         DSFDebugDataItem dsfDebugDataItemIp = new DSFDebugDataItem(96, 134552016L ,b);
-        DSFDebugDataItem dsfDebugDataItemChannel = new DSFDebugDataItem(104, 134551952L, a);
+        DSFDebugDataItem dsfDebugDataItemChannel = new DSFDebugDataItem(8, 134551952L, a);
 
         Unmarshaller unmarshaller = new Unmarshaller();
         TypeEquipmentDescription typeEquipmentDescription = unmarshaller.unmarshal(new File("C:\\Users\\Chris\\Desktop\\Bachelorarbeit\\Practical\\QC11_Testing\\Release\\EquipmentDefinition_C1.xml"));
@@ -35,20 +35,20 @@ class JSONDebugDataMessageTest {
 
         String variableName         = "LDR_UdpIp_Context";
         LinkedList<String> datarecordElementChannel = new LinkedList<>();
-        //datarecordElementChannel.add("EthChannelContext");
-        //LinkedList<String> datarecordElementIp = new LinkedList<>();
-        //datarecordElementIp.add("IpInterfaceContext");
+        datarecordElementChannel.add("EthChannelContext");
+        LinkedList<String> datarecordElementIp = new LinkedList<>();
+        datarecordElementIp.add("IpInterfaceContext");
 
 
         DSFRecordElement dsfRecordElementChannel = new DSFRecordElement(variableName,datarecordElementChannel);
-        //DSFRecordElement dsfRecordElementIp = new DSFRecordElement(variableName,datarecordElementIp);
+        DSFRecordElement dsfRecordElementIp = new DSFRecordElement(variableName,datarecordElementIp);
 
         DSFEquipmentDefinitionRecordElement recordElementChannel = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementChannel);
-        //DSFEquipmentDefinitionRecordElement recordElementIp = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementIp);
+        DSFEquipmentDefinitionRecordElement recordElementIp = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementIp);
 
         JSONDebugDataMessage jsonDebugDataMessage = new JSONDebugDataMessage();
         jsonDebugDataMessage.addField(dsfDebugDataItemChannel, recordElementChannel);
-        //jsonDebugDataMessage.addField(dsfDebugDataItemIp, recordElementIp);
+        jsonDebugDataMessage.addField(dsfDebugDataItemIp, recordElementIp);
 
         JSONObject s = jsonDebugDataMessage.getJsonDebugDataObject();
 

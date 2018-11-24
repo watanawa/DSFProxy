@@ -3,10 +3,7 @@ package com.schwipps.DSFBuilder;
 import com.schwipps.DSFBuilder.enums.EquipmentDefinitionDataType;
 import com.schwipps.dsf.TypeCompilationUnit;
 
-import java.awt.*;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 
 public class DSFEquipmentDefinitionRecordElement {
     private byte[] address;

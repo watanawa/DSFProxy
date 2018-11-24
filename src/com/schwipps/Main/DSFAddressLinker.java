@@ -7,7 +7,6 @@ import com.schwipps.dsf.TypeCompilationUnit;
 import com.schwipps.dsf.TypeDebugSymbolSet;
 import com.schwipps.dsf.TypeEquipmentDescription;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
 

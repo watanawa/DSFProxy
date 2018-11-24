@@ -3,9 +3,9 @@ package com.schwipps.DSFBuilder.Test;
 import com.schwipps.DSFBuilder.DSFBodyDebugDataReadRequest;
 import com.schwipps.DSFBuilder.DSFDebugDataItem;
 import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DSFBodyDebugDataReadRequestTest {
 
