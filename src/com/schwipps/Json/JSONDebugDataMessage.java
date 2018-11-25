@@ -56,6 +56,7 @@ public class JSONDebugDataMessage {
                 fillDataObject(jsonObjectVariable.getJSONObject(dsfRecordElement.getVariable()),dsfDebugDataItem.getData() , dsfEquipmentDefinitionRecordElement,dsfRecordElement.getRecordElementNames().getLast() );
             }
             else {
+                //Prelastentry
                 fillDataObject(jsonRecordElements[numOfRecordElementParents-2],dsfDebugDataItem.getData() , dsfEquipmentDefinitionRecordElement,dsfRecordElement.getRecordElementNames().getLast() );
             }
         }

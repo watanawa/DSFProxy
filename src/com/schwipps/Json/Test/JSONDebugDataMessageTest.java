@@ -3,6 +3,7 @@ package com.schwipps.Json.Test;
 import com.schwipps.DSFBuilder.DSFDebugDataItem;
 import com.schwipps.DSFBuilder.DSFEquipmentDefinitionRecordElement;
 import com.schwipps.DSFBuilder.DSFRecordElement;
+import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
 import com.schwipps.Json.JSONDebugDataMessage;
 import com.schwipps.Main.DSFAddressLinker;
 import com.schwipps.Main.Unmarshaller;
@@ -40,8 +41,8 @@ class JSONDebugDataMessageTest {
         datarecordElementIp.add("IpInterfaceContext");
 
 
-        DSFRecordElement dsfRecordElementChannel = new DSFRecordElement(variableName,datarecordElementChannel);
-        DSFRecordElement dsfRecordElementIp = new DSFRecordElement(variableName,datarecordElementIp);
+        DSFRecordElement dsfRecordElementChannel = new DSFRecordElement(variableName,datarecordElementChannel, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
+        DSFRecordElement dsfRecordElementIp = new DSFRecordElement(variableName,datarecordElementIp, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
 
         DSFEquipmentDefinitionRecordElement recordElementChannel = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementChannel);
         DSFEquipmentDefinitionRecordElement recordElementIp = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementIp);

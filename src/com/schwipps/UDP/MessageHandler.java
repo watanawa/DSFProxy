@@ -56,10 +56,10 @@ public class MessageHandler {
         MessageType messageType =  dsfMessage.getMessageType();
         switch (messageType){
             case TARGET_AGENT_DATA_MESSAGE:
-                handleTargetAgentDataMessage(dsfMessage);
+                handleDSFTargetAgentDataMessage(dsfMessage);
                 break;
             case DEBUG_DATA_MESSAGE:
-                handleDebugDataMessage(dsfMessage);
+                handleDSFDebugDataMessage(dsfMessage);
                 break;
             //THESE WILL ACTUALLY NEVER BE RECEIVED FROM THE TARGET AGENT BUT ONLY SEND FROM THE PROXY
             case TARGET_AGENT_REQUEST_MESSAGE:
@@ -70,7 +70,7 @@ public class MessageHandler {
 
         }
     }
-    public void handleTargetAgentDataMessage(DSFMessage dsfMessage){
+    public void handleDSFTargetAgentDataMessage(DSFMessage dsfMessage){
         DSFBodyTargetAgentDataMessage targetAgentDataMessage = new DSFBodyTargetAgentDataMessage(dsfMessage.getBody().getByte());
         if(!connectedToTargetAgent){
             if(targetAgentDataMessage.getMode().equals(TargetAgentMode.CONNECTED)){
@@ -92,17 +92,15 @@ public class MessageHandler {
 
 
     }
-    public void handleDebugDataMessage(DSFMessage dsfMessage){
+    public void handleDSFDebugDataMessage(DSFMessage dsfMessage){
         DSFBodyDebugDataMessage debugDataMessage = new DSFBodyDebugDataMessage(dsfMessage.getBody().getByte());
         ArrayList<Integer> receiverClientsPorts = dsfAddressLinker.getRegisteredPorts();
         HashMap<Integer, JSONDebugDataMessage> hashMapPortJSONDebugDataMessage = assembleJsonDebugDataMessages(debugDataMessage, receiverClientsPorts);
         //Send the messages
         for(int port: receiverClientsPorts){
             udpSenderClient.sendMessage(port, hashMapPortJSONDebugDataMessage.get(port).toByte());
-            //TODO TESTWISE
             try {
                 out.write(hashMapPortJSONDebugDataMessage.get(port).getJsonDebugDataObject().toString());
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -111,9 +109,28 @@ public class MessageHandler {
 
     public void handleMessageClient(byte message[], int offset, int length) {
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);
-        //TODO
+        String jsonMessage = null;
+        try {
+            jsonMessage = new String(temp, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if(jsonMessage.startsWith("{JSONDebugDataReadRequest")){
+            handleJSONDebugDataReadRequest(jsonMessage);
+        }
+        else if(jsonMessage.startsWith("{JSONDebugDataWriteRequest")){
+            handleJSONDebugDataWriteRequest(jsonMessage);
+        }
+
     }
 
+    private void handleJSONDebugDataReadRequest(String jsonMessage) {
+    }
+    private void handleJSONDebugDataWriteRequest(String jsonMessage) {
+    }
+
+    //Assembles the JSONDebugDataMessages from the DSFDebugDataMessages and links the registered Clientports to them
+    //Additionally, single read requested items are removed from the dsfAddressLinker
     private HashMap<Integer, JSONDebugDataMessage> assembleJsonDebugDataMessages(DSFBodyDebugDataMessage debugDataMessage, ArrayList<Integer> receiverClientsPorts){
         HashMap<Integer, JSONDebugDataMessage> hashMapPortMessage = new HashMap<>();
         //Create an empty  JSONDebugDataMessage for each port;
@@ -130,6 +147,10 @@ public class MessageHandler {
                 //Get the Json Message Corresponding to the port
                 JSONDebugDataMessage jsonDebugDataMessage = hashMapPortMessage.get(tuple.getPort());
                 jsonDebugDataMessage.addField(dsfDebugDataItem, tuple.getDsfEquipmentDefinitionRecordElement());
+                //Remove the tuple from the DSFAddressLinker if the message was request only once
+                if(!tuple.getDsfEquipmentDefinitionRecordElement().getDsfRecordElement().isPeriodic()){
+                    dsfAddressLinker.unregisterMessage(tuple.getPort(), tuple.getDsfEquipmentDefinitionRecordElement().getDsfRecordElement());
+                }
             }
         }
         return hashMapPortMessage;

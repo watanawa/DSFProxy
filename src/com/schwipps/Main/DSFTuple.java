@@ -9,6 +9,7 @@ public class DSFTuple{
     public DSFTuple(int port, DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement){
         setPort(port);
         setDSFEquipmentDefinitionRecordElement(dsfEquipmentDefinitionRecordElement);
+
     }
 
     private void setPort(int port) {
@@ -23,4 +24,5 @@ public class DSFTuple{
     public DSFEquipmentDefinitionRecordElement getDsfEquipmentDefinitionRecordElement(){
         return dsfEquipmentDefinitionRecordElement;
     }
+
 }

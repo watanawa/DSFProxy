@@ -51,7 +51,7 @@ public class DSFAddressLinker {
     public ArrayList<Integer> getRegisteredPorts(){
         return registeredPorts;
     }
-    public void registerMessage(int portClient, DSFRecordElement dsfRecordElement ){
+    public void registerMessage(int portClient, DSFRecordElement dsfRecordElement){
         DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(dsfRecordElement);
         byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
         long addressVal = byteToLong(address);
@@ -89,6 +89,17 @@ public class DSFAddressLinker {
             }
         }
     }
+
+    public void unregisterMessage(DSFTuple tuple){
+        int port = tuple.port;
+        long address = tuple.getDsfEquipmentDefinitionRecordElement().getAddressLong();
+
+        hashMapAddressToPort.get(address).remove(tuple);
+        if(!portRegistered(port)){
+            registeredPorts.remove(new Integer(port));
+        }
+    }
+
     public void unregisterMessage(int portClient, DSFRecordElement dsfRecordElement){
         DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(dsfRecordElement);
         byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
@@ -100,6 +111,7 @@ public class DSFAddressLinker {
             for(int i = 0; i<  dsfTuples.size(); i++ ){
                 if(dsfTuples.get(i).getPort() == portClient){
                     dsfTuples.remove(i);
+                    break;
                 }
             }
             // Clear key if only one was present
@@ -107,7 +119,6 @@ public class DSFAddressLinker {
                 hashMapAddressToPort.remove(addressVal);
             }
         }
-
         //remove from portList if necessary
         if(!portRegistered(portClient)){
             registeredPorts.remove(new Integer(portClient));
@@ -125,31 +136,35 @@ public class DSFAddressLinker {
         String variableName         = dsfRecordElement.getVariable();
         LinkedList<String> recordElementNames = dsfRecordElement.getRecordElementNames();
 
-
+        //Address of the variable
         byte[] address = null;
         Object datatype = null;
+        //Address offset in bit
         int offset = 0;
+        //Size in bit
         int size = 0;
         DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = null;
+        //Scope contains al elements in the corresponding compilationUnit
         List<Object> scope = null;
         TypeCompilationUnit compilationUnitArgument = null;
+        //This String contains the DatatypeId of the parentElement
         String variableDataTypeId = "";
 
         //Fix the starting addres from the variable
         for(TypeCompilationUnit compilationUnit : typeDebugSymbolSet.getCompilationUnit()) {
 
-                List<Object> variableAndDatatype = compilationUnit.getVariableAndCharacterDataTypeAndBooleanDataType();
-                for (Object variableAndDataTypeItem : variableAndDatatype) {
-                    if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.VARIABLE)) {
-                        TypeCompilationUnit.Variable variable = (TypeCompilationUnit.Variable) variableAndDataTypeItem;
-                        if (variable.getName().equals(variableName)) {
-                            address = variable.getAddress();
-                            scope = variableAndDatatype;
-                            compilationUnitArgument = compilationUnit;
-                            variableDataTypeId = variable.getDataTypeId();
-                        }
+            List<Object> variableAndDatatype = compilationUnit.getVariableAndCharacterDataTypeAndBooleanDataType();
+            for (Object variableAndDataTypeItem : variableAndDatatype) {
+                if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.VARIABLE)) {
+                    TypeCompilationUnit.Variable variable = (TypeCompilationUnit.Variable) variableAndDataTypeItem;
+                    if (variable.getName().equals(variableName)) {
+                        address = variable.getAddress();
+                        scope = variableAndDatatype;
+                        compilationUnitArgument = compilationUnit;
+                        variableDataTypeId = variable.getDataTypeId();
                     }
                 }
+            }
         }
         //If only variable name given
         if(dsfRecordElement.getRecordElementNames().size() == 0){
@@ -165,21 +180,47 @@ public class DSFAddressLinker {
                 }
             }
         }
+        //More than a variable name given
         else {
             for (int i = 0; i < recordElementNames.size(); i++) {
-                for (Object variableAndDataTypeItem : scope) {
-                    if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)) {
-                        TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
-                        if (recordDataType.getId().equals(variableDataTypeId)) {
-                            for (TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()) {
-                                if(recordElement.getName().equalsIgnoreCase(recordElementNames.get(i))){
-                                    offset += recordElement.getBitOffset().intValue();
-                                    variableDataTypeId = recordElement.getDataTypeId();
-                                    //Arrived at destination
-                                    if(i == (recordElementNames.size()-1)){
-                                        size = recordElement.getBitSize().intValue();
-                                        datatype = getEquipmentDefinitionDataType(scope, recordElement.getDataTypeId());
-                                        break;
+                //Element is an Index
+                if(recordElementNames.get(i).matches("\\d+")){
+                    //Get the datatype ID of the previous RecordElement
+                    //Assumption: The parent element of a list can only be a recordelement and not another list
+                    for (Object variableAndDataTypeItem : scope) {
+                        if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.LIST)) {
+                            TypeCompilationUnit.ListDataType listDataType= (TypeCompilationUnit.ListDataType) variableAndDataTypeItem;
+                            //found the list
+                            if (listDataType.getId().equals(variableDataTypeId)) {
+                                int index = Integer.valueOf(recordElementNames.get(i));
+                                offset += listDataType.getListElement().getBitSize().intValue() *(index);
+                                variableDataTypeId = listDataType.getListElement().getDataTypeId();
+                                //Check if this was the last element of the linkedList
+                                if(i == (recordElementNames.size()-1)){
+                                    size = listDataType.getListElement().getBitSize().intValue();
+                                    datatype = getEquipmentDefinitionDataType(scope, listDataType.getListElement().getDataTypeId());
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                //Element is a RecordElement
+                else{
+                    for (Object variableAndDataTypeItem : scope) {
+                        if (getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.RECORD)) {
+                            TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataTypeItem;
+                            if (recordDataType.getId().equals(variableDataTypeId)) {
+                                for (TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()) {
+                                    if(recordElement.getName().equalsIgnoreCase(recordElementNames.get(i))){
+                                        offset += recordElement.getBitOffset().intValue();
+                                        variableDataTypeId = recordElement.getDataTypeId();
+                                        //Arrived at destination
+                                        if(i == (recordElementNames.size()-1)){
+                                            size = recordElement.getBitSize().intValue();
+                                            datatype = getEquipmentDefinitionDataType(scope, recordElement.getDataTypeId());
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -191,19 +232,18 @@ public class DSFAddressLinker {
 
 
         //Assemble the information
-            if(address!= null ){
-                //Add offset to address and convert to byte again
-                byte[] temp = new byte[8];
-                System.arraycopy(address, 0, temp, 8-address.length, address.length);
-                long addressLong = ByteBuffer.wrap(temp).getLong();
-                addressLong += offset;
-                byte[] addressByte = Arrays.copyOfRange(ByteBuffer.allocate(Long.BYTES).putLong(addressLong).array(), 4, 8);
+        if(address!= null ){
+            //Add offset to address and convert to byte again
+            byte[] temp = new byte[8];
+            System.arraycopy(address, 0, temp, 8-address.length, address.length);
+            long addressLong = ByteBuffer.wrap(temp).getLong();
+            addressLong += offset;
+            byte[] addressByte = Arrays.copyOfRange(ByteBuffer.allocate(Long.BYTES).putLong(addressLong).array(), 4, 8);
 
             dsfEquipmentDefinitionRecordElement = new DSFEquipmentDefinitionRecordElement(addressByte, datatype,getDataType(datatype), size,compilationUnitArgument, dsfRecordElement );
         }
         return dsfEquipmentDefinitionRecordElement;
     }
-
 
     private Object getEquipmentDefinitionDataType(List<Object> scope , String datatypeId){
         Object dataType = null;

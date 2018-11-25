@@ -3,6 +3,7 @@ import com.schwipps.DSFBuilder.Builder;
 import com.schwipps.DSFBuilder.DSFDebugDataItem;
 import com.schwipps.DSFBuilder.DSFRecordElement;
 import com.schwipps.DSFBuilder.enums.DebugDataReadRequestCommand;
+import com.schwipps.Json.JSONDebugDataMessage;
 import com.schwipps.UDP.*;
 import com.schwipps.dsf.TypeEquipmentDescription;
 import com.schwipps.dsf.TypeEthernetLink;
@@ -46,7 +47,7 @@ public class Launcher {
     //STARTUP [0] EquipmentdescriptionFile [1] Port of TargetAgentSocket [2] Port of ClientSocket
     public static void main(String[] args) {
         System.out.println("Launching DSF Proxy");
-
+        JSONDebugDataMessage jsonDebugDataMessage = new JSONDebugDataMessage();
         Launcher launcher = new Launcher(args);
         launcher.setEquipmentDescriptionFile();
         launcher.unmarshall();
@@ -155,9 +156,9 @@ public class Launcher {
         LinkedList<String> datarecordElementAccZ = new LinkedList<>();
         datarecordElementAccZ.add("AccelerationZ");
 
-        DSFRecordElement dsfRecordElementX = new DSFRecordElement(variableName,datarecordElementAccX);
-        DSFRecordElement dsfRecordElementY = new DSFRecordElement(variableName,datarecordElementAccY);
-        DSFRecordElement dsfRecordElementZ = new DSFRecordElement(variableName,datarecordElementAccZ);
+        DSFRecordElement dsfRecordElementX = new DSFRecordElement(variableName,datarecordElementAccX,DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
+        DSFRecordElement dsfRecordElementY = new DSFRecordElement(variableName,datarecordElementAccY, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
+        DSFRecordElement dsfRecordElementZ = new DSFRecordElement(variableName,datarecordElementAccZ, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
 
         dataItems[0] = this.dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementX).getDSFDebugDataItem();
         dataItems[1] = this.dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementY).getDSFDebugDataItem();
