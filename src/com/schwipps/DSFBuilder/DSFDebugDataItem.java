@@ -85,7 +85,7 @@ public class DSFDebugDataItem {
     }
     public void setData(byte[] data){
         //TODO limit 256
-        if(data != null && data.length < 1024){
+        if(data != null && data.length < 2000){
             System.arraycopy(data, 0, b, 5, data.length);
         }
     }

@@ -100,7 +100,7 @@ public class MessageHandler {
         for(int port: receiverClientsPorts){
             udpSenderClient.sendMessage(port, hashMapPortJSONDebugDataMessage.get(port).toByte());
             try {
-                out.write(hashMapPortJSONDebugDataMessage.get(port).getJsonDebugDataObject().toString());
+                out.write("\n"+hashMapPortJSONDebugDataMessage.get(port).getJsonDebugDataObject().toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }

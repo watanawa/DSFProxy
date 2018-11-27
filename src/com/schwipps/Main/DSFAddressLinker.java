@@ -128,7 +128,7 @@ public class DSFAddressLinker {
     public ArrayList<DSFTuple> getTuple (byte[] address){
         return hashMapAddressToPort.get(byteToLong(address));
     }
-    // Um in die Hashmap zu schreiben
+    //TODO change to private, only public for testing
     public DSFEquipmentDefinitionRecordElement getDSFEquipmentDefinitionRecordElement(DSFRecordElement dsfRecordElement){
         //BUILDS a DSFEquipmentDefinitionRecordElement
         //TODO build the DSFequipment instance
@@ -342,7 +342,6 @@ public class DSFAddressLinker {
             return EquipmentDefinitionDataType.UNDEFINED;
         }
     }
-
 
     private boolean portRegistered(int port){
         Iterator it = hashMapAddressToPort.entrySet().iterator();

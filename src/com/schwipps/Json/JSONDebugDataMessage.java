@@ -28,7 +28,8 @@ public class JSONDebugDataMessage {
     }
     public void addField(DSFDebugDataItem dsfDebugDataItem, DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement) {
         //check if this message actually registered to receive this dataItem
-        if ((dsfDebugDataItem.getDataLength() == dsfEquipmentDefinitionRecordElement.getBitSize()/8) && dsfDebugDataItem.getDataItemAddressLong() == dsfEquipmentDefinitionRecordElement.getAddressLong()) {
+        //(dsfDebugDataItem.getDataLength() == dsfEquipmentDefinitionRecordElement.getBitSize()/8) &&
+        if (dsfDebugDataItem.getDataItemAddressLong() == dsfEquipmentDefinitionRecordElement.getAddressLong()) {
             //Check if the variable name already exists anywhere
             JSONObject jsonObjectVariable = jsonDebugDataObject.getJSONObject("JSONDebugDataMessage");
             int numOfRecordElementParents = dsfEquipmentDefinitionRecordElement.getDsfRecordElement().getRecordElementNames().size();
@@ -92,8 +93,6 @@ public class JSONDebugDataMessage {
             case VARIABLE: //Will not happen
                 break;
             case CHARACTER://Char is always 8 bit -> 1 byte
-
-                dataObject.put(key, byteData[0]);
                 dataObjectAddChar(dataObject, byteData[0], key);
                 break;
             case BOOLEAN: //Not Existing
@@ -119,14 +118,13 @@ public class JSONDebugDataMessage {
                 dataObjectAddEnum(dataObject, byteData, enumDataType, key);
                 break;
             case LIST:
-                JSONArray dataArray = getJsonArrayByString(dataObject, key);
                 TypeCompilationUnit.ListDataType listDataType = (TypeCompilationUnit.ListDataType) dsfEquipmentDefinitionRecordElement.getDataTypeItem();
-                dataArrayAddList(dataArray, byteData, listDataType, dsfEquipmentDefinitionRecordElement);
+                dataObjectAddList(dataObject, byteData, listDataType, dsfEquipmentDefinitionRecordElement, key);
                 break;
             case RECORD:
                 TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) dsfEquipmentDefinitionRecordElement.getDataTypeItem();
                 // Get Dataobject from key
-                dataObjectAddRecord(getJsonObjectByString(dataObject, key),byteData,recordDataType, dsfEquipmentDefinitionRecordElement);
+                dataObjectAddRecord(dataObject,byteData,recordDataType, dsfEquipmentDefinitionRecordElement, key);
 
                 break;
             //TODO - BEGINNING FROM HERE NOT SUPPORTED
@@ -138,7 +136,8 @@ public class JSONDebugDataMessage {
 
     }
     private void dataObjectAddChar(JSONObject jsonObject, byte data, String key){
-        jsonObject.put(key, ((char)data));
+
+        jsonObject.put(key, Character.toString((char)data));
     }
     private void dataObjectAddPointer(JSONObject jsonObject, byte[] byteData, TypeCompilationUnit.PointerDataType pointerDataTypeItem,String key) {
         int byteLength = pointerDataTypeItem.getBitSize().intValue()/8;
@@ -186,75 +185,26 @@ public class JSONDebugDataMessage {
             }
         }
     }
-
-    private void dataArrayAddChar(JSONArray jsonArray, byte data){
-        jsonArray.put(((char)data));
-    }
-    private void dataArrayAddPointer(JSONArray jsonArray, byte[] byteData, TypeCompilationUnit.PointerDataType pointerDataTypeItem) {
-        int byteLength = pointerDataTypeItem.getBitSize().intValue()/8;
-        byte[] temp = new byte[Long.BYTES];
-        System.arraycopy(byteData, 0, temp, Long.BYTES-byteLength, byteLength);
-        jsonArray.put(ByteBuffer.wrap(temp).getLong());
-    }
-    private void dataArrayAddInteger(JSONArray jsonArray, byte[] byteData,TypeCompilationUnit.IntegerDataType integerDataTypeItem){
-        int byteLength = integerDataTypeItem.getBitSize().intValue()/8;
-        boolean signed = true;
-        switch (integerDataTypeItem.getSigned()){
-            case NO: signed = false;
-                break;
-            case YES:signed = true;
-                break;
-        }
-        if(signed){
-            if(byteLength == 4){
-                jsonArray.put(ByteBuffer.wrap(byteData).getInt());
-            }
-            else {
-                //TODO 8Bit and Signed
-            }
-        }
-        else {
-            byte [] temp = new byte[Long.BYTES];
-            System.arraycopy(byteData, 0, temp, Long.BYTES-byteLength, byteLength);
-            jsonArray.put(ByteBuffer.wrap(temp).getLong());
-        }
-    }
-    private void dataArrayAddFloat(JSONArray jsonArray, byte[] byteData, TypeCompilationUnit.FloatDataType floatDataTypeItem){
-        int byteLength = floatDataTypeItem.getBitSize().intValue()/8;
-        byte[]temp = new byte[Double.BYTES];
-        System.arraycopy(byteData, 0, temp, Double.BYTES-byteLength, byteLength);
-        jsonArray.put(ByteBuffer.wrap(temp).getDouble());
-    }
-    private void dataArrayAddEnum(JSONArray jsonArray, byte[] byteData, TypeCompilationUnit.EnumDataType enumDataTypeItem){
-        int byteLength = enumDataTypeItem.getBitSize().intValue()/8;
-        byte[]temp = new byte[Long.BYTES];
-        System.arraycopy(byteData, 0, temp, Long.BYTES-byteLength, byteLength);
-        long val = ByteBuffer.wrap(temp).getLong();
-        for(TypeCompilationUnit.EnumDataType.EnumElement enumElement : enumDataTypeItem.getEnumElement()){
-            if(enumElement.getValue().longValue() == val){
-                jsonArray.put(enumElement.getName());
-            }
-        }
-    }
-
-    private void dataArrayAddList(JSONArray dataArray, byte[] byteData, TypeCompilationUnit.ListDataType listDataTypeItem, DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement){
+    private void dataObjectAddList(JSONObject dataObject, byte[] byteData, TypeCompilationUnit.ListDataType listDataTypeItem, DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement,String key){
         TypeCompilationUnit compilationUnit = dsfEquipmentDefinitionRecordElement.getCompilationUnit();
         int numberOfElements = listDataTypeItem.getListIndex().get(0).getRangeUpper().intValue()+1;
         //int numberOfElements = dsfEquipmentDefinitionRecordElement.getBitSize()/listDataTypeItem.getListElement().getBitSize().intValue();
         int putBytes = listDataTypeItem.getListElement().getBitSize().intValue()/8;
         String dataTypeId = listDataTypeItem.getListElement().getDataTypeId();
 
+        JSONObject subDataObject;
         for(Object variableAndDataType : compilationUnit.getVariableAndCharacterDataTypeAndBooleanDataType()){
             switch (getDataType(variableAndDataType)){
                 case VARIABLE: //WILL NOT HAPPEN
                     break;
                 case CHARACTER:
                     TypeCompilationUnit.CharacterDataType characterDataType = (TypeCompilationUnit.CharacterDataType) variableAndDataType;
-                    //found
+                    subDataObject = new JSONObject();
                     if(characterDataType.getId().equalsIgnoreCase(dataTypeId)){
                         for (int i = 0; i< numberOfElements; i++){
-                            dataArrayAddChar(dataArray,byteData[i]);
+                            dataObjectAddChar(subDataObject,byteData[i], String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
                 case BOOLEAN:
@@ -262,53 +212,61 @@ public class JSONDebugDataMessage {
                 case INTEGER:
                     TypeCompilationUnit.IntegerDataType integerDataType = (TypeCompilationUnit.IntegerDataType) variableAndDataType;
                     if(integerDataType.getId().equalsIgnoreCase(dataTypeId)){
+                         subDataObject = new JSONObject();
                         for(int i = 0; i <numberOfElements;i++){
-                            dataArrayAddInteger(dataArray, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), integerDataType);
+                            dataObjectAddInteger(subDataObject, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), integerDataType, String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
                 case FLOAT:
                     TypeCompilationUnit.FloatDataType floatDataType = (TypeCompilationUnit.FloatDataType)   variableAndDataType;
                     if(floatDataType.getId().equalsIgnoreCase(dataTypeId)){
+                         subDataObject = new JSONObject();
                         for(int i = 0; i<numberOfElements; i++){
-                            dataArrayAddFloat(dataArray, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), floatDataType);
+                            dataObjectAddFloat(subDataObject, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), floatDataType,  String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
                 case POINTER:
                     TypeCompilationUnit.PointerDataType pointerDataType = (TypeCompilationUnit.PointerDataType)   variableAndDataType;
                     if(pointerDataType.getId().equalsIgnoreCase(dataTypeId)){
+                         subDataObject = new JSONObject();
                         for(int i = 0; i<numberOfElements; i++){
-                            dataArrayAddPointer(dataArray, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), pointerDataType);
+                            dataObjectAddPointer(subDataObject, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), pointerDataType, String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
                 case ENUM:
                     TypeCompilationUnit.EnumDataType enumDataType = (TypeCompilationUnit.EnumDataType)   variableAndDataType;
                     if(enumDataType.getId().equalsIgnoreCase(dataTypeId)){
+                         subDataObject = new JSONObject();
                         for(int i = 0; i<numberOfElements; i++){
-                            dataArrayAddEnum(dataArray, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), enumDataType);
+                            dataObjectAddEnum(subDataObject, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), enumDataType, String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
-                //THE CASES LISTED BELOW WILL NOT OCCUR
                 case LIST:
                     TypeCompilationUnit.ListDataType listDataType = (TypeCompilationUnit.ListDataType) variableAndDataType;
                     if(listDataType.getId().equalsIgnoreCase(dataTypeId)){
+                         subDataObject = new JSONObject();
                         for (int i=0; i<numberOfElements;i++){
-                            dataArrayAddList(dataArray, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), listDataType,dsfEquipmentDefinitionRecordElement );
+                            dataObjectAddList(subDataObject, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), listDataType,dsfEquipmentDefinitionRecordElement,String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
                 case RECORD:
                     TypeCompilationUnit.RecordDataType recordDataType = (TypeCompilationUnit.RecordDataType) variableAndDataType;
                     if(recordDataType.getId().equalsIgnoreCase(dataTypeId)){
+                        subDataObject = new JSONObject();
                         for(int i = 0; i<numberOfElements; i++){
-                                JSONObject jsonObjectTemp = new JSONObject();
-                                dataObjectAddRecord(jsonObjectTemp, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), recordDataType, dsfEquipmentDefinitionRecordElement);
-                                dataArray.put(jsonObjectTemp);
-
+                                dataObjectAddRecord(subDataObject, Arrays.copyOfRange(byteData, i*putBytes,i*putBytes+putBytes ), recordDataType, dsfEquipmentDefinitionRecordElement, String.valueOf(i));
                         }
+                        dataObject.put(key, subDataObject);
                     }
                     break;
                 case UNION: //TODO
@@ -320,10 +278,10 @@ public class JSONDebugDataMessage {
         }
     }
     //Write Key + value to the Object
-    private void dataObjectAddRecord(JSONObject dataObject, byte[] byteData, TypeCompilationUnit.RecordDataType recordDataType, DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement) {
+    private void dataObjectAddRecord(JSONObject dataObject, byte[] byteData, TypeCompilationUnit.RecordDataType recordDataType, DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement, String key) {
         //Loop trhough all record puts of the RecordDataType
         //And create a new JSON object for each
-        JSONArray jsonArray;
+        JSONObject subDataObject = new JSONObject();
         for(TypeCompilationUnit.RecordDataType.RecordElement recordElement : recordDataType.getRecordElement()) {
             //Identify the datype of each and act accordingly
             String datatypeId = recordElement.getDataTypeId();
@@ -332,7 +290,7 @@ public class JSONDebugDataMessage {
                     case CHARACTER:
                         TypeCompilationUnit.CharacterDataType characterDataType = (TypeCompilationUnit.CharacterDataType) variableOrDataType;
                         if(characterDataType.getId().equalsIgnoreCase(datatypeId)){
-                            dataObjectAddChar(dataObject, byteData[(recordElement.getBitOffset().intValue()/8)], recordElement.getName());
+                            dataObjectAddChar(subDataObject, byteData[(recordElement.getBitOffset().intValue()/8)], recordElement.getName());
                         }
                         break;
                     case BOOLEAN:
@@ -343,7 +301,7 @@ public class JSONDebugDataMessage {
                         if(integerDataType.getId().equalsIgnoreCase(datatypeId)){
                             int start = recordElement.getBitOffset().intValue();
                             int end = recordElement.getBitOffset().intValue()+recordElement.getBitSize().intValue();
-                            dataObjectAddInteger(dataObject, Arrays.copyOfRange(byteData, start/8, end/8), integerDataType, recordElement.getName());
+                            dataObjectAddInteger(subDataObject, Arrays.copyOfRange(byteData, start/8, end/8), integerDataType, recordElement.getName());
                         }
                         break;
                     case FLOAT:
@@ -351,7 +309,7 @@ public class JSONDebugDataMessage {
                         if(floatDataType.getId().equalsIgnoreCase(datatypeId)){
                             int start = recordElement.getBitOffset().intValue();
                             int end = recordElement.getBitOffset().intValue()+recordElement.getBitSize().intValue();
-                            dataObjectAddFloat(dataObject, Arrays.copyOfRange(byteData, start/8, end/8), floatDataType, recordElement.getName());
+                            dataObjectAddFloat(subDataObject, Arrays.copyOfRange(byteData, start/8, end/8), floatDataType, recordElement.getName());
                         }
                         break;
                     case POINTER:
@@ -359,7 +317,7 @@ public class JSONDebugDataMessage {
                         if(pointerDataType.getId().equalsIgnoreCase(datatypeId)){
                             int start = recordElement.getBitOffset().intValue();
                             int end = recordElement.getBitOffset().intValue()+recordElement.getBitSize().intValue();
-                            dataObjectAddPointer(dataObject, Arrays.copyOfRange(byteData, start/8, end/8), pointerDataType, recordElement.getName());
+                            dataObjectAddPointer(subDataObject, Arrays.copyOfRange(byteData, start/8, end/8), pointerDataType, recordElement.getName());
                         }
                         break;
                     case ENUM:
@@ -367,7 +325,7 @@ public class JSONDebugDataMessage {
                         if(enumDataType.getId().equalsIgnoreCase(datatypeId)){
                             int start = recordElement.getBitOffset().intValue();
                             int end = recordElement.getBitOffset().intValue()+recordElement.getBitSize().intValue();
-                            dataObjectAddEnum(dataObject, Arrays.copyOfRange(byteData, start/8 , end/8), enumDataType, recordElement.getName());
+                            dataObjectAddEnum(subDataObject, Arrays.copyOfRange(byteData, start/8 , end/8), enumDataType, recordElement.getName());
                         }
                         break;
                     case LIST:
@@ -375,9 +333,7 @@ public class JSONDebugDataMessage {
                         if(listDataType.getId().equalsIgnoreCase(datatypeId)){
                             int start = recordElement.getBitOffset().intValue();
                             int end = recordElement.getBitOffset().intValue()+recordElement.getBitSize().intValue();
-                            jsonArray = getJsonArrayByString(dataObject, recordElement.getName());
-                            dataArrayAddList(jsonArray, Arrays.copyOfRange(byteData, start/8, end/8), listDataType,dsfEquipmentDefinitionRecordElement);
-                            dataObject.put(recordElement.getName(), jsonArray);
+                            dataObjectAddList(subDataObject, Arrays.copyOfRange(byteData, start/8, end/8), listDataType,dsfEquipmentDefinitionRecordElement, recordElement.getName());
                         }
                         break;
                     case RECORD:
@@ -385,9 +341,7 @@ public class JSONDebugDataMessage {
                         if(recordDataType1.getId().equalsIgnoreCase(datatypeId)){
                             int start = recordElement.getBitOffset().intValue();
                             int end = recordElement.getBitOffset().intValue()+recordElement.getBitSize().intValue();
-                            JSONObject subJsonObject = new JSONObject();
-                            dataObjectAddRecord(subJsonObject, Arrays.copyOfRange(byteData, start/8, end/8), recordDataType1, dsfEquipmentDefinitionRecordElement);
-                            dataObject.put(recordElement.getName(), subJsonObject);
+                            dataObjectAddRecord(subDataObject, Arrays.copyOfRange(byteData, start/8, end/8), recordDataType1, dsfEquipmentDefinitionRecordElement, recordElement.getName());
                         }
                         break;
                     //TODO
@@ -401,6 +355,7 @@ public class JSONDebugDataMessage {
                 }
             }
         }
+        dataObject.put(key, subDataObject);
     }
 
 

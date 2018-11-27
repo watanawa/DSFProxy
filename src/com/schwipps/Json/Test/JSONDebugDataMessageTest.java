@@ -20,38 +20,36 @@ class JSONDebugDataMessageTest {
     @Test
     public void  check(){
         Random random = new Random();
-        byte[] b = new byte[96];
-        random.nextBytes(b);
-        byte[] a = new byte[8];
+        byte[] a = new byte[1736];
         random.nextBytes(a);
 
 
-        DSFDebugDataItem dsfDebugDataItemIp = new DSFDebugDataItem(96, 134552016L ,b);
-        DSFDebugDataItem dsfDebugDataItemChannel = new DSFDebugDataItem(8, 134551952L, a);
+        //DSFDebugDataItem dsfDebugDataItemIp = new DSFDebugDataItem(96, 134321372L ,b);
+        DSFDebugDataItem dsfDebugDataItemChannel = new DSFDebugDataItem(1736, 134321372L, a);
 
         Unmarshaller unmarshaller = new Unmarshaller();
         TypeEquipmentDescription typeEquipmentDescription = unmarshaller.unmarshal(new File("C:\\Users\\Chris\\Desktop\\Bachelorarbeit\\Practical\\QC11_Testing\\Release\\EquipmentDefinition_C1.xml"));
         DSFAddressLinker dsfAddressLinker = new DSFAddressLinker(typeEquipmentDescription);
 
 
-        String variableName         = "LDR_UdpIp_Context";
+        String variableName         = "LDR_Config_Context";
         LinkedList<String> datarecordElementChannel = new LinkedList<>();
-        datarecordElementChannel.add("EthChannelContext");
+        //datarecordElementChannel.add("EthChannelContext");
         LinkedList<String> datarecordElementIp = new LinkedList<>();
         datarecordElementIp.add("IpInterfaceContext");
 
 
         DSFRecordElement dsfRecordElementChannel = new DSFRecordElement(variableName,datarecordElementChannel, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
-        DSFRecordElement dsfRecordElementIp = new DSFRecordElement(variableName,datarecordElementIp, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
+       // DSFRecordElement dsfRecordElementIp = new DSFRecordElement(variableName,datarecordElementIp, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY);
 
         DSFEquipmentDefinitionRecordElement recordElementChannel = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementChannel);
-        DSFEquipmentDefinitionRecordElement recordElementIp = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementIp);
+       // DSFEquipmentDefinitionRecordElement recordElementIp = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(dsfRecordElementIp);
 
         JSONDebugDataMessage jsonDebugDataMessage = new JSONDebugDataMessage();
         jsonDebugDataMessage.addField(dsfDebugDataItemChannel, recordElementChannel);
-        jsonDebugDataMessage.addField(dsfDebugDataItemIp, recordElementIp);
+        //jsonDebugDataMessage.addField(dsfDebugDataItemIp, recordElementIp);
 
-        JSONObject s = jsonDebugDataMessage.getJsonDebugDataObject();
+        String s = jsonDebugDataMessage.getJsonDebugDataObject().toString();
 
     }
 }
