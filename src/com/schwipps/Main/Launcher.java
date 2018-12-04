@@ -47,7 +47,6 @@ public class Launcher {
     //STARTUP [0] EquipmentdescriptionFile [1] Port of TargetAgentSocket [2] Port of ClientSocket
     public static void main(String[] args) {
         System.out.println("Launching DSF Proxy");
-        JSONDebugDataMessage jsonDebugDataMessage = new JSONDebugDataMessage();
         Launcher launcher = new Launcher(args);
         launcher.setEquipmentDescriptionFile();
         launcher.unmarshall();
@@ -60,7 +59,7 @@ public class Launcher {
 
         System.out.println("DSF Proxy succesfully started");
 
-        launcher.test();
+        //launcher.test();
 
     }
 

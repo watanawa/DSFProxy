@@ -11,7 +11,7 @@ public class UDPReceiverTargetAgent implements Runnable{
 
     public UDPReceiverTargetAgent(DatagramSocket socket){
         this.socket = socket;
-        buffer = new byte[1024];
+        buffer = new byte[2048];
     }
 
     //Receiver get Message+Sender

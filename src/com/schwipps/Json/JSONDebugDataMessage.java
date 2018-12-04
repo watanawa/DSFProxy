@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.util.Arrays;
 
 
@@ -47,7 +48,7 @@ public class JSONDebugDataMessage {
                         jsonRecordElements[i] = getJsonObjectByString(jsonObjectVariable, dsfRecordElement.getVariable());
                     }
                     else {
-                        jsonRecordElements[i] = getJsonObjectByString(jsonRecordElements[i-1],dsfRecordElement.getRecordElementNames().get(i));
+                        jsonRecordElements[i] = getJsonObjectByString(jsonRecordElements[i-1],dsfRecordElement.getRecordElementNames().get(i-1));
                     }
                 }
             }
@@ -58,7 +59,7 @@ public class JSONDebugDataMessage {
             }
             else {
                 //Prelastentry
-                fillDataObject(jsonRecordElements[numOfRecordElementParents-2],dsfDebugDataItem.getData() , dsfEquipmentDefinitionRecordElement,dsfRecordElement.getRecordElementNames().getLast() );
+                fillDataObject(jsonRecordElements[numOfRecordElementParents-1],dsfDebugDataItem.getData() , dsfEquipmentDefinitionRecordElement,dsfRecordElement.getRecordElementNames().getLast() );
             }
         }
 
@@ -172,7 +173,13 @@ public class JSONDebugDataMessage {
         int byteLength = floatDataTypeItem.getBitSize().intValue()/8;
         byte[]temp = new byte[Double.BYTES];
         System.arraycopy(byteData, 0, temp, Double.BYTES-byteLength, byteLength);
-        jsonObject.put(key,ByteBuffer.wrap(temp).getDouble());
+        double d = ByteBuffer.wrap(temp).getDouble();
+        if(Double.isInfinite(d) || Double.isNaN(d)){
+            //System.out.println("Test");
+        }else
+        {
+            jsonObject.put(key,ByteBuffer.wrap(temp).getDouble());
+        }
     }
     private void dataObjectAddEnum(JSONObject jsonObject, byte[] byteData, TypeCompilationUnit.EnumDataType enumDataTypeItem,String key){
         int byteLength = enumDataTypeItem.getBitSize().intValue()/8;

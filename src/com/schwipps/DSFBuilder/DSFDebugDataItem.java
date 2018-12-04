@@ -46,8 +46,7 @@ public class DSFDebugDataItem {
     }
 
     public int getDataLength(){
-        byte[] temp = {0x00, 0x00,0x00,b[0]};
-        return ByteBuffer.allocate(4).wrap(temp).getInt();
+        return ByteBuffer.wrap(new byte[]{0,0,0,b[0]}).getInt();
     }
     public long getDataItemAddressLong(){
         byte[] temp = {0x00, 0x00,0x00,0x00,b[1],b[2],b[3],b[4]};
@@ -64,7 +63,7 @@ public class DSFDebugDataItem {
         return Arrays.copyOfRange(b,5,b.length);
     }
     public int getDataItemLength(){
-        return (5+getDataLength());
+        return b.length;
     }
 
     public void setDataLength(int dataLength){
@@ -85,7 +84,7 @@ public class DSFDebugDataItem {
     }
     public void setData(byte[] data){
         //TODO limit 256
-        if(data != null && data.length < 2000){
+        if(data != null){
             System.arraycopy(data, 0, b, 5, data.length);
         }
     }

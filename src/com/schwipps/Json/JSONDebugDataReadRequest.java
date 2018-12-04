@@ -46,10 +46,10 @@ public class JSONDebugDataReadRequest {
                 DebugDataReadRequestCommand command = null;
                 LinkedList<String> recordElements = new LinkedList<>();
                 for(int j=0; j < requestArray.length(); j++){
-                    if(j==0){
-                        variableName = requestArray.getString(0);
+                    if(j == 1){
+                        variableName = requestArray.getString(j);
                     }
-                    else if(j == (requestArray.length()-1)){
+                    else if(j == 0){
                         if(requestArray.getString(j).equalsIgnoreCase("Periodic")){
                             command = DebugDataReadRequestCommand.READ_DATA_PERIODICALLY;
                         }

@@ -60,6 +60,7 @@ public class DSFBodyDebugDataMessage extends DSFBody {
     }
     public DSFDebugDataItem[] getDebugDataItems(){
         List<DSFDebugDataItem> debugDataItems = new ArrayList<DSFDebugDataItem>();
+        if(b.length > 11){
         int pointer = 6;
         do{
             int dataLength = byteToInt(b[pointer]);
@@ -67,5 +68,9 @@ public class DSFBodyDebugDataMessage extends DSFBody {
             pointer += 5 + dataLength;
         }while(pointer < b.length);
         return debugDataItems.toArray(new DSFDebugDataItem[debugDataItems.size()]);
+        }
+        else{
+            return null;
+        }
     }
 }

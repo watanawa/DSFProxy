@@ -50,6 +50,6 @@ class JSONDebugDataMessageTest {
         //jsonDebugDataMessage.addField(dsfDebugDataItemIp, recordElementIp);
 
         String s = jsonDebugDataMessage.getJsonDebugDataObject().toString();
-
+        System.out.println(s);
     }
 }

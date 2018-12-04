@@ -47,5 +47,8 @@ public class DSFRecordElement {
     public void setReadRequestCommand(DebugDataReadRequestCommand readRequestCommand) {
         this.readRequestCommand = readRequestCommand;
     }
+    public DSFRecordElement clone(){
+        return new DSFRecordElement(this.variable, (LinkedList<String>) recordElementNames.clone(), readRequestCommand);
+    }
 }
 
