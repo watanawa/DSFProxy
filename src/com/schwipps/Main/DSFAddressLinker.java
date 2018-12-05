@@ -419,7 +419,7 @@ public class DSFAddressLinker {
                     DSFRecordElement dsfRecordElement = mainElement.getDsfRecordElement().clone();
                     dsfRecordElement.getRecordElementNames().addLast(String.valueOf(i));
                     ArrayList<DSFEquipmentDefinitionRecordElement> subSubElements = splitMesssage(getDSFEquipmentDefinitionRecordElement(dsfRecordElement));
-                    for(int j=0; i>subSubElements.size();j++){
+                    for(int j=0; j>subSubElements.size();j++){
                         subElements.add(subSubElements.get(j));
                     }
                 }

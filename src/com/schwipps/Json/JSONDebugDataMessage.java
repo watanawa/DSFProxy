@@ -8,6 +8,8 @@ import com.schwipps.dsf.TypeCompilationUnit;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.util.Arrays;
