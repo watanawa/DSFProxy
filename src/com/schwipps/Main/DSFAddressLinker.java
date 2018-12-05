@@ -1,5 +1,6 @@
 package com.schwipps.Main;
 
+import com.schwipps.DSFBuilder.DSFDebugDataItem;
 import com.schwipps.DSFBuilder.DSFEquipmentDefinitionRecordElement;
 import com.schwipps.DSFBuilder.DSFRecordElement;
 import com.schwipps.DSFBuilder.enums.EquipmentDefinitionDataType;
@@ -7,6 +8,7 @@ import com.schwipps.dsf.TypeCompilationUnit;
 import com.schwipps.dsf.TypeDebugSymbolSet;
 import com.schwipps.dsf.TypeEquipmentDescription;
 
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -202,6 +204,13 @@ public class DSFAddressLinker {
                                 size += recordElement.getBitSize().intValue();
                             }
                             datatype = recordDataType;
+                        }
+                    }
+                    if(getDataType(variableAndDataTypeItem).equals(EquipmentDefinitionDataType.LIST)){
+                        TypeCompilationUnit.ListDataType listDataType = (TypeCompilationUnit.ListDataType) variableAndDataTypeItem;
+                        if(listDataType.getId().equals(variableDataTypeId)){
+                            size += listDataType.getBitSize().intValue();
+                            datatype = listDataType;
                         }
                     }
                 }

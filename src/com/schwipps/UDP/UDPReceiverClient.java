@@ -26,7 +26,7 @@ public class UDPReceiverClient implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            messageHandler.handleMessageClient(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength(), datagramPacket.getPort());
+            messageHandler.handleJSONMessageClient(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength(), datagramPacket.getPort());
         }
         running = false;
     }

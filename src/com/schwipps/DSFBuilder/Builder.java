@@ -39,14 +39,14 @@ public class  Builder {
 
     public static DSFMessage buildDebugDataWriteRequest(int targetAgentId, DSFDebugDataItem[] dsfDebugDataItems){
         DSFBody     body        = new DSFBodyDebugDataWriteRequest(targetAgentId, dsfDebugDataItems );
-        DSFHeader   header      = new DSFHeader(0, MessageType.DEBUG_DATA_WRITE_REQUEST_MESSAGE,body.getByte().length,false,2, 0);
+        DSFHeader   header      = new DSFHeader(1, MessageType.DEBUG_DATA_WRITE_REQUEST_MESSAGE,body.getByte().length,false,2, 0);
         DSFMessage  dsfMessage  = new DSFMessage(header,body,null);
         return      dsfMessage;
     }
 
     public static DSFMessage buildDebugDataReadRequest(int targetAgentId, DebugDataReadRequestCommand command, DSFDebugDataItem[] dsfDebugDataItems){
         DSFBody     body        = new DSFBodyDebugDataReadRequest(targetAgentId, command, dsfDebugDataItems);
-        DSFHeader   header       = new DSFHeader(0, MessageType.DEBUG_DATA_READ_REQUEST_MESSAGE,body.getByte().length,false,2, 0);
+        DSFHeader   header       = new DSFHeader(1, MessageType.DEBUG_DATA_READ_REQUEST_MESSAGE,body.getByte().length,false,2, 0);
         DSFMessage  dsfMessage  = new DSFMessage(header,body,null);
         return      dsfMessage;
     }

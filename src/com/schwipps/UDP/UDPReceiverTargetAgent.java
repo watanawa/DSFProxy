@@ -25,7 +25,7 @@ public class UDPReceiverTargetAgent implements Runnable{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            messageHandler.handleMessageTargetAgent(datagramPacket.getData(), datagramPacket.getOffset(), datagramPacket.getLength());
+            messageHandler.handleDSFMessageTargetAgent(datagramPacket.getData(), datagramPacket.getOffset(), datagramPacket.getLength());
         }
         running = false;
     }

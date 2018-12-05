@@ -47,6 +47,7 @@ public class MessageHandler {
     public void setDSFAddressLinker(DSFAddressLinker dsfAddressLinkerArg){
         dsfAddressLinker = dsfAddressLinkerArg;
     }
+
     public  UDPSenderClient getUdpSenderClient(){
         return udpSenderClient;
     }
@@ -54,7 +55,7 @@ public class MessageHandler {
         return udpSenderTargetAgent;
     }
 
-    public void handleMessageTargetAgent(byte message[], int offset, int length){
+    public void handleDSFMessageTargetAgent(byte message[], int offset, int length){
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);;
         DSFMessage dsfMessage = new DSFMessage(temp);
         if(dsfMessage.messageErrorFree())
@@ -106,24 +107,18 @@ public class MessageHandler {
     }
     public void handleDSFDebugDataMessage(DSFMessage dsfMessage){
         DSFBodyDebugDataMessage debugDataMessage = new DSFBodyDebugDataMessage(dsfMessage.getBody().getByte());
-        //TODO remove
         ArrayList<Integer> receiverClientsPorts = dsfAddressLinker.getRegisteredPorts();
+
         HashMap<Integer, JSONDebugDataMessage> hashMapPortJSONDebugDataMessage = assembleJsonDebugDataMessages(debugDataMessage, receiverClientsPorts);
         //Send the messages
         for(int port: receiverClientsPorts){
             udpSenderClient.sendMessage(port, hashMapPortJSONDebugDataMessage.get(port).toByte());
-            /*
-            try {
-                out.write("\n"+hashMapPortJSONDebugDataMessage.get(port).getJsonDebugDataObject().toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
         }
         dsfAddressLinker.EmptyUnregisterQueue();
 
     }
 
-    public void handleMessageClient(byte message[], int offset, int length, int port) {
+    public void handleJSONMessageClient(byte message[], int offset, int length, int port) {
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);
         String jsonMessage = null;
         try {
@@ -139,7 +134,6 @@ public class MessageHandler {
         }
 
     }
-
     private void handleJSONDebugDataReadRequest(String jsonMessage, int port) {
         JSONDebugDataReadRequest jsonDebugDataReadRequest = new JSONDebugDataReadRequest(jsonMessage);
         //Extract the requested recordElements from the message
@@ -177,26 +171,7 @@ public class MessageHandler {
             //Now send these items
             // Split them in such a way that they are smaller than the targetAgentRXBuffer
             if(recordElementsPeriodic.size() >0){
-                ArrayList<DSFDebugDataItem> tempPeriodic = new ArrayList<>();
-                int byteCount = 0;
-                for(int i = 0; i < recordElementsPeriodic.size();i++){
-                    tempPeriodic.add(recordElementsPeriodic.get(i));
-                    byteCount+= recordElementsPeriodic.get(i).getDataItemLength();
-                    //Check if the message would exceed the buffer already 8Byte Head 2Byte ReadRequestBodyHead 5Byte SafetyDistance
-                    if(byteCount >= (targetAgentRXBuffer-15) || i == (recordElementsPeriodic.size()-1)){
-                        DSFDebugDataItem[] tempPeriodicArray = tempPeriodic.toArray(new DSFDebugDataItem[tempPeriodic.size()]);
-                        udpSenderTargetAgent.sendMessage(Builder.buildDebugDataReadRequest(targetAgentID, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY  ,tempPeriodicArray ).getByte());
-                        byteCount = 0;
-                        tempPeriodic.clear();
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                //udpSenderTargetAgent.sendMessage(Builder.buildDebugDataReadRequest(targetAgentID, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY   , recordElementsPeriodic.toArray(new DSFDebugDataItem[recordElementsPeriodic.size()])).getByte());
+                udpSenderTargetAgent.sendMessage(Builder.buildDebugDataReadRequest(targetAgentID, DebugDataReadRequestCommand.READ_DATA_PERIODICALLY   , recordElementsPeriodic.toArray(new DSFDebugDataItem[recordElementsPeriodic.size()])).getByte());
             }
             if(recordElementsOnce.size()>0){
                 udpSenderTargetAgent.sendMessage(Builder.buildDebugDataReadRequest(targetAgentID, DebugDataReadRequestCommand.READ_DATA_ONCE   , recordElementsOnce.toArray(new DSFDebugDataItem[recordElementsOnce.size()])).getByte());
@@ -254,7 +229,6 @@ public class MessageHandler {
 
         targetAgentWritable = true;
     }
-
     //Assembles the JSONDebugDataMessages from the DSFDebugDataMessages and links the registered Clientports to them
     //Additionally, single read requested items are removed from the dsfAddressLinker
     private HashMap<Integer, JSONDebugDataMessage> assembleJsonDebugDataMessages(DSFBodyDebugDataMessage debugDataMessage, ArrayList<Integer> receiverClientsPorts){
@@ -413,7 +387,6 @@ public class MessageHandler {
 
         return array;
     }
-
     public boolean isConnectedToTargetAgent() {
         return connectedToTargetAgent;
     }
