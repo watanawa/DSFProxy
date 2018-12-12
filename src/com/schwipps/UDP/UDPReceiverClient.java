@@ -12,7 +12,7 @@ public class UDPReceiverClient implements Runnable {
 
     public UDPReceiverClient(DatagramSocket socket){
         this.socket = socket;
-        buffer = new byte[1024];
+        buffer = new byte[4048];
     }
 
     //Receiver get Message+Sender

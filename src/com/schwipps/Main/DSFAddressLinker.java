@@ -58,7 +58,7 @@ public class DSFAddressLinker {
     public ArrayList<Integer> getRegisteredPorts(){
         return registeredPorts;
     }
-    public void registerMessage(int portClient, DSFRecordElement dsfRecordElement){
+    public int registerMessage(int portClient, DSFRecordElement dsfRecordElement){
         DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = getDSFEquipmentDefinitionRecordElement(dsfRecordElement);
         byte[] address = dsfEquipmentDefinitionRecordElement.getAddress();
         long addressVal = byteToLong(address);
@@ -75,7 +75,7 @@ public class DSFAddressLinker {
                     //existing = true;
                     //if(!registeredPorts.contains(new Integer(portClient))){
                     //registeredPorts.add(portClient);
-                    return;
+                    return 0;
                 }
             }
             //add entry to arraylist
@@ -83,7 +83,9 @@ public class DSFAddressLinker {
                 hashMapAddressToPort.get(addressVal).add(new DSFTuple(portClient, dsfEquipmentDefinitionRecordElement));
                 if(!registeredPorts.contains(new Integer(portClient))){
                     registeredPorts.add(portClient);
+
                 }
+                return 0;
             }
         }
         //Address is not existing yet
@@ -95,6 +97,7 @@ public class DSFAddressLinker {
                 registeredPorts.add(portClient);
             }
         }
+        return 1;
     }
     public void putTupleIntoUnregisterQueue(DSFTuple tuple) {
         unregisterQueue.add(tuple);

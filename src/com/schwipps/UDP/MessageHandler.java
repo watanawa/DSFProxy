@@ -150,8 +150,10 @@ public class MessageHandler {
                         ArrayList<DSFEquipmentDefinitionRecordElement> dsfEquipmentDefinitionRecordElementsSmall = dsfAddressLinker.splitMesssage(dsfEquipmentDefinitionRecordElement);
                         if(dsfRecordElement.getReadRequestCommand().equals(DebugDataReadRequestCommand.READ_DATA_PERIODICALLY)){
                             for(int i=0; i< dsfEquipmentDefinitionRecordElementsSmall.size();i++){
-                                recordElementsPeriodic.add(new DSFDebugDataItem(dsfEquipmentDefinitionRecordElementsSmall.get(i).getBitSize()/8, dsfEquipmentDefinitionRecordElementsSmall.get(i).getAddressLong()));
-                                dsfAddressLinker.registerMessage(port,dsfEquipmentDefinitionRecordElementsSmall.get(i).getDsfRecordElement());
+                                int requestNecessary = dsfAddressLinker.registerMessage(port,dsfEquipmentDefinitionRecordElementsSmall.get(i).getDsfRecordElement());
+                                if(requestNecessary !=  0){
+                                    recordElementsPeriodic.add(new DSFDebugDataItem(dsfEquipmentDefinitionRecordElementsSmall.get(i).getBitSize()/8, dsfEquipmentDefinitionRecordElementsSmall.get(i).getAddressLong()));
+                                }
                             }
                         }
                         else if(dsfRecordElement.getReadRequestCommand().equals(DebugDataReadRequestCommand.READ_DATA_ONCE)){
