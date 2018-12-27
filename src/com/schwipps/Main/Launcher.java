@@ -137,7 +137,6 @@ public class Launcher {
         Thread threadTargetAgentPresenceChecker = new Thread(targetAgentPresenceChecker,"TargetAgentPresenceChecker");
         threadTargetAgentPresenceChecker.start();
     }
-
     public void test(){
 
         try {

@@ -85,6 +85,8 @@ public class MessageHandler {
                 System.out.println("Succesfully connected to TargetAgent " +targetAgentDataMessage.getTargetAgentId());
                 targetAgentID = targetAgentDataMessage.getTargetAgentId();
                 targetAgentRXBuffer = targetAgentDataMessage.getRXBufferSize();
+                cancelAllDataItems();
+                dsfAddressLinker.clearRoutingLists();
             }
             else if(targetAgentDataMessage.getMode().equals(TargetAgentMode.DISCONNECTED)){
                 System.out.println("Target Agent found");
@@ -188,6 +190,8 @@ public class MessageHandler {
         DSFDebugDataItem[] dsfDebugDataItems = new DSFDebugDataItem[hashMap.size()];
         int i=0;
         if(hashMap != null){
+            //OPtimize Subsequent write processes
+
             for( Map.Entry<DSFRecordElement, Object> entry : hashMap.entrySet()){
                 DSFEquipmentDefinitionRecordElement dsfEquipmentDefinitionRecordElement = dsfAddressLinker.getDSFEquipmentDefinitionRecordElement(entry.getKey());
                 int dataByteLength = dsfEquipmentDefinitionRecordElement.getBitSize()/8;
@@ -197,6 +201,7 @@ public class MessageHandler {
                 i++;
             }
         }
+
         if(!targetAgentWritable){
             makeTargetAgentWritable();
         }
@@ -293,11 +298,19 @@ public class MessageHandler {
                     int integerValue = (Integer) object;
                     temp = ByteBuffer.allocate(Integer.BYTES).putInt(integerValue).array();
                 }else if(object instanceof  Short){
-                    short shotValue = (Short) object;
-                    temp = ByteBuffer.allocate(Integer.BYTES).putShort(shotValue).array();
+                    short shortValue = (Short) object;
+                    temp = ByteBuffer.allocate(Short.BYTES).putShort(shortValue).array();
                 }else if(object instanceof Long){
                     long longValue = (Long) object;
-                    temp = ByteBuffer.allocate(Integer.BYTES).putLong(longValue).array();
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(longValue).array();
+                }
+                else if(object instanceof Float){
+                    float floatValue = (Float) object;
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(((Float)floatValue).longValue()).array();
+                }
+                else if(object instanceof Double){
+                    double doubleValue = (Double) object;
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(((Double)doubleValue).longValue()).array();
                 }
                 break;
             case FLOAT:
@@ -345,6 +358,14 @@ public class MessageHandler {
                     long longValue = (Long) object;
                     temp = ByteBuffer.allocate(Long.BYTES).putLong(longValue).array();
                 }
+                else if(object instanceof Float){
+                    float aFloatValue = (Float) object;
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(((Float)aFloatValue).longValue()).array();
+                }
+                else if(object instanceof Double){
+                    double aDoubleValue = (Double) object;
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(((Double)aDoubleValue).longValue()).array();
+                }
                 break;
             case ENUM:
                 TypeCompilationUnit.EnumDataType enumDataType= (TypeCompilationUnit.EnumDataType) dataTypeItem;
@@ -353,8 +374,8 @@ public class MessageHandler {
                     int integerValue = (Integer) object;
                     temp = ByteBuffer.allocate(Integer.BYTES).putInt(integerValue).array();
                 }else if(object instanceof Short){
-                    short shotValue = (Short) object;
-                    temp = ByteBuffer.allocate(Integer.BYTES).putShort(shotValue).array();
+                    short shortValue = (Short) object;
+                    temp = ByteBuffer.allocate(Integer.BYTES).putShort(shortValue).array();
                 }else if(object instanceof Long){
                     long longValue = (Long) object;
                     temp = ByteBuffer.allocate(Integer.BYTES).putLong(longValue).array();
@@ -367,6 +388,14 @@ public class MessageHandler {
                         }
                     }
                 }
+                else if(object instanceof Float){
+                    float aFloatValue = (Float) object;
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(((Float)aFloatValue).longValue()).array();
+                }
+                else if(object instanceof Double){
+                    double aDoubleValue = (Double) object;
+                    temp = ByteBuffer.allocate(Long.BYTES).putLong(((Double)aDoubleValue).longValue()).array();
+                }
                 break;
             case LIST:
                 break;
@@ -377,6 +406,7 @@ public class MessageHandler {
             case UNDEFINED:
                 break;
         }
+        if(temp != null){
             array = new byte[length];
             if(length < temp.length){
                 //TODO MESSAGE
@@ -385,11 +415,13 @@ public class MessageHandler {
             else{
                 System.arraycopy(temp, 0, array, temp.length-length,length );
             }
-
-
+        }
         return array;
     }
     public boolean isConnectedToTargetAgent() {
         return connectedToTargetAgent;
+    }
+    public void cancelAllDataItems(){
+        udpSenderTargetAgent.sendMessage(Builder.buildDebugDataReadRequest(targetAgentID, DebugDataReadRequestCommand.CANCEL_ALL_PERIODIC_TRANSFERS, new DSFDebugDataItem[]{null}).getByte() );
     }
 }

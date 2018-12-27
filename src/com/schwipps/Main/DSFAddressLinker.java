@@ -433,4 +433,10 @@ public class DSFAddressLinker {
         }
         return subElements;
     }
+
+    public void clearRoutingLists(){
+        registeredPorts.clear();
+        unregisterQueue.clear();
+        hashMapAddressToPort.clear();
+    }
 }
