@@ -412,6 +412,7 @@ public class MessageHandler {
                 else if(object instanceof Double){
                     double aDoubleValue = (Double) object;
                     temp = ByteBuffer.allocate(Long.BYTES).putLong(((Double)aDoubleValue).longValue()).array();
+                    // Test
                 }
                 break;
             case LIST:
