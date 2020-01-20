@@ -27,6 +27,8 @@ public class MessageHandler {
     private  UDPSenderClient udpSenderClient;
     private  DSFAddressLinker dsfAddressLinker;
 
+    int counterAircraftstate =0;
+    int counterControlCommands=0;
     FileWriter out;
     public MessageHandler(){
         /*try {
@@ -66,7 +68,14 @@ public class MessageHandler {
                 handleDSFTargetAgentDataMessage(dsfMessage);
                 break;
             case DEBUG_DATA_MESSAGE:
+                long time = System.nanoTime();
                 handleDSFDebugDataMessage(dsfMessage);
+                time = System.nanoTime() - time;
+                counterControlCommands++;
+                if(counterControlCommands == 100){
+                    System.out.println("Delay Controlsurface" + time );
+                    counterControlCommands = 0;
+                }
                 break;
             //THESE WILL ACTUALLY NEVER BE RECEIVED FROM THE TARGET AGENT BUT ONLY SEND FROM THE PROXY
             case TARGET_AGENT_REQUEST_MESSAGE:
@@ -121,6 +130,7 @@ public class MessageHandler {
     }
 
     public void handleJSONMessageClient(byte message[], int offset, int length, int port) {
+        long time = System.nanoTime();
         byte[] temp = Arrays.copyOfRange(message,offset , offset+length);
         String jsonMessage = null;
         try {
@@ -135,6 +145,12 @@ public class MessageHandler {
             handleJSONDebugDataWriteRequest(jsonMessage);
         }
 
+        time = System.nanoTime() - time;
+        counterAircraftstate++;
+        if(counterAircraftstate == 100){
+            System.out.println("Delay Aircraftstate" + time );
+            counterAircraftstate = 0;
+        }
     }
     private void handleJSONDebugDataReadRequest(String jsonMessage, int port) {
         JSONDebugDataReadRequest jsonDebugDataReadRequest = new JSONDebugDataReadRequest(jsonMessage);
@@ -208,6 +224,7 @@ public class MessageHandler {
         udpSenderTargetAgent.sendMessage(Builder.buildDebugDataWriteRequest(targetAgentID, dsfDebugDataItems).getByte());
     }
 
+    // Updating the Aircraft state works only if these magic bits have been set.
     private void makeTargetAgentWritable() {
 
         DSFDebugDataItem[] magicItems = new DSFDebugDataItem[2];

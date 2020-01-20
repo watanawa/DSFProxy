@@ -48,7 +48,6 @@ public class DSFHeader {
 		intTemp[3] = b[1];
 		return ByteBuffer.wrap(intTemp).getInt();
 	}
-
 	public MessageType getMessageType() {
         byte[] intTemp = new byte[4];
         intTemp[1] = 0x00;
@@ -61,7 +60,6 @@ public class DSFHeader {
         }
         return MessageType.INVALID_MESSAGE_HANDLE;
 	}
-	
 	public int getMessageLength() {
         byte[] intTemp = new byte[4];
         intTemp[1] = 0x00;
@@ -70,11 +68,9 @@ public class DSFHeader {
         intTemp[3] = b[5];
         return ByteBuffer.wrap(intTemp).getInt();
 	}
-	
 	public boolean getAckRequired() {
 	    return ((b[6] & (0x80)) != 0) ; // 1000 0000
 	}
-	
 	public int getIDDVersion() {
         byte[] intTemp = new byte[4];
         intTemp[0] = 0x00;
@@ -83,7 +79,6 @@ public class DSFHeader {
         intTemp[3] = (byte)(b[6] & 0x7F); // 0111 1111
         return ByteBuffer.wrap(intTemp).getInt();
 	}
-	
 	public int getChecksumSize() {
 		//BigEndian
 		int bit1 = (b[7] >> 7) & 1;
